@@ -30,6 +30,12 @@
                   Manage Users
                 </a>
               </c:if>
+                
+                <!-- NEW  My Profile Link -->
+                <a href="${pageContext.request.contextPath}/profile"
+                    class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100">
+                    My Profile
+                </a>
             </nav>
           </div>
           <div class="p-6">
