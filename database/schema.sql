@@ -1,0 +1,29 @@
+CREATE DATABASE IF NOT EXISTS ticket_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ticket_system;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(60) NOT NULL,
+    role ENUM('USER','SUPPORT_LEVEL_1','SUPPORT_LEVEL_2','SUPPORT_LEVEL_3','ADMIN') NOT NULL DEFAULT 'USER',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tickets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    status ENUM('OPEN','IN_PROGRESS','RESOLVED','CLOSED') NOT NULL DEFAULT 'OPEN',
+    assigned_to INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- for the first time setup
+UPDATE ticket_system.users
+SET role = 'ADMIN'
+WHERE username = 'add_your_username';
