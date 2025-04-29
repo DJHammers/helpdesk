@@ -6,46 +6,30 @@ import lk.helpdesk.support.model.Ticket;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        Integer userId = (Integer)req.getAttribute("userId");
+        String  role   = (String) req.getAttribute("role");
+        if (userId == null || !"ADMIN".equals(role)) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
-        int userId = (Integer) session.getAttribute("userId");
-        String role;
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement("SELECT role FROM users WHERE id = ?")) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (!rs.next() || !"ADMIN".equals(rs.getString("role"))) {
-                    resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-                    return;
-                }
-            }
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        }
 
-        List<User> users = new ArrayList<>();
+        List<User> users   = new ArrayList<>();
         List<Ticket> tickets = new ArrayList<>();
+
         try (Connection conn = DBConfig.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id, username, email, role, created_at FROM users");
+            try (PreparedStatement ps = conn.prepareStatement(
+                     "SELECT id,username,email,role,created_at FROM users");
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     users.add(new User(
@@ -58,8 +42,8 @@ public class DashboardServlet extends HttpServlet {
                 }
             }
             try (PreparedStatement ps = conn.prepareStatement(
-                    "SELECT t.id, u.username, t.subject, t.status, t.created_at " +
-                    "FROM tickets t JOIN users u ON t.user_id = u.id");
+                     "SELECT t.id,u.username,t.subject,t.status,t.created_at " +
+                     "FROM tickets t JOIN users u ON t.user_id = u.id");
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     tickets.add(new Ticket(
@@ -74,6 +58,7 @@ public class DashboardServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException(e);
         }
+
         req.setAttribute("usersList", users);
         req.setAttribute("ticketsList", tickets);
         req.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp").forward(req, resp);
