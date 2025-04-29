@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS ticket_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS ticket_system;
 USE ticket_system;
 
 CREATE TABLE IF NOT EXISTS users (
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(60) NOT NULL,
-    role ENUM('USER','SUPPORT','ADMIN') NOT NULL DEFAULT 'USER',
+    role ENUM('User','Support','Admin') NOT NULL DEFAULT 'User',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS tickets (
     user_id INT NOT NULL,
     subject VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    status ENUM('OPEN','IN_PROGRESS','RESOLVED','CLOSED') NOT NULL DEFAULT 'OPEN',
-    assigned_role ENUM('USER','SUPPORT','ADMIN') DEFAULT NULL,
+    status ENUM('Open','In_Progress','Resolved','Closed') NOT NULL DEFAULT 'Open',
+    assigned_role ENUM('User','Support','Admin') DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS tickets (
 
 -- for the first time setup
 UPDATE ticket_system.users
-SET role = 'ADMIN'
+SET role = 'Admin'
 WHERE username = 'add_your_username';
 
 CREATE TABLE IF NOT EXISTS ticket_messages (

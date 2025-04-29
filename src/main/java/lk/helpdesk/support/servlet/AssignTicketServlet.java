@@ -12,7 +12,7 @@ import java.util.List;
 
 @WebServlet("/tickets/assign")
 public class AssignTicketServlet extends HttpServlet {
-    private static final List<String> ALLOWED = Arrays.asList("SUPPORT","ADMIN");
+    private static final List<String> ALLOWED = Arrays.asList("Support","Admin");
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

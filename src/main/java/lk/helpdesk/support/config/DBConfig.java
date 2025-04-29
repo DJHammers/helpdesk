@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class DBConfig {
     private static final String URL = "jdbc:mysql://localhost:3306/ticket_system";
-    private static final String USER = "root";
+    private static final String User = "root";
     private static final String PASS = "";
 
     static {
@@ -16,6 +16,6 @@ public class DBConfig {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASS);
+        return DriverManager.getConnection(URL, User, PASS);
     }
 }

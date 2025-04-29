@@ -15,9 +15,9 @@ import java.util.List;
 @WebServlet("/admin/users/add")
 public class AddUserServlet extends HttpServlet {
     private static final List<String> ROLES = Arrays.asList(
-        "USER",
-        "SUPPORT",
-        "ADMIN"
+        "User",
+        "Support",
+        "Admin"
     );
 
     @Override

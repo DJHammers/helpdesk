@@ -29,20 +29,20 @@ public class CloseTicketServlet extends HttpServlet {
         }
 
         String sql;
-        if ("USER".equals(role)) {
-            sql = "UPDATE tickets SET status = 'CLOSED' WHERE id = ? AND user_id = ?";
+        if ("User".equals(role)) {
+            sql = "UPDATE tickets SET status = 'Close' WHERE id = ? AND user_id = ?";
         } else {
-            sql = "UPDATE tickets SET status = 'CLOSED' WHERE id = ?";
+            sql = "UPDATE tickets SET status = 'Close' WHERE id = ?";
         }
 
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, ticketId);
-            if ("USER".equals(role)) {
+            if ("User".equals(role)) {
                 ps.setInt(2, userId);
             }
             int updated = ps.executeUpdate();
-            if (updated == 0 && "USER".equals(role)) {
+            if (updated == 0 && "User".equals(role)) {
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }

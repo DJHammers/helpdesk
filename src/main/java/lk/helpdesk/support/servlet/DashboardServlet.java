@@ -20,7 +20,7 @@ public class DashboardServlet extends HttpServlet {
         Integer userId = (Integer) req.getAttribute("userId");
         String role    = (String)  req.getAttribute("role");
         String view    = req.getParameter("view") == null ? "tickets" : req.getParameter("view");
-        boolean isAdmin    = "ADMIN".equals(role);
+        boolean isAdmin    = "Admin".equals(role);
         boolean showUsers  = isAdmin && "users".equals(view);
 
         if (showUsers) {
@@ -52,7 +52,7 @@ public class DashboardServlet extends HttpServlet {
         List<Object> params = new ArrayList<>();
         boolean whereUsed = false;
 
-        if ("USER".equals(role)) {
+        if ("User".equals(role)) {
             sql.append(" WHERE t.user_id = ?");
             params.add(userId);
             whereUsed = true;
@@ -60,23 +60,23 @@ public class DashboardServlet extends HttpServlet {
 
         if (statusFilter != null && !statusFilter.isEmpty()) {
             switch (statusFilter) {
-                case "OPEN":
-                case "IN_PROGRESS":
-                case "RESOLVED":
-                case "CLOSED":
+                case "Open":
+                case "In_Progress":
+                case "Resolved":
+                case "Close":
                     sql.append(whereUsed ? " AND " : " WHERE ")
                        .append("t.status = ?");
                     params.add(statusFilter);
                     whereUsed = true;
                     break;
-                case "ASSIGNED_ADMIN":
+                case "ASSIGNED_Admin":
                     sql.append(whereUsed ? " AND " : " WHERE ")
-                       .append("t.assigned_role = 'ADMIN'");
+                       .append("t.assigned_role = 'Admin'");
                     whereUsed = true;
                     break;
-                case "ASSIGNED_SUPPORT":
+                case "ASSIGNED_Support":
                     sql.append(whereUsed ? " AND " : " WHERE ")
-                       .append("t.assigned_role = 'SUPPORT'");
+                       .append("t.assigned_role = 'Support'");
                     whereUsed = true;
                     break;
             }
