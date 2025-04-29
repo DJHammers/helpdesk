@@ -1,15 +1,16 @@
 package lk.helpdesk.support.servlet;
 
 import lk.helpdesk.support.config.DBConfig;
-import lk.helpdesk.support.model.User;
 import lk.helpdesk.support.model.Ticket;
+import lk.helpdesk.support.model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
@@ -17,11 +18,10 @@ public class DashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         Integer userId = (Integer) req.getAttribute("userId");
-        String  role   = (String)  req.getAttribute("role");
-
-        String view = req.getParameter("view") == null ? "tickets" : req.getParameter("view");
-        boolean isAdmin     = "ADMIN".equals(role);
-        boolean showUsers   = isAdmin && "users".equals(view);
+        String role    = (String)  req.getAttribute("role");
+        String view    = req.getParameter("view") == null ? "tickets" : req.getParameter("view");
+        boolean isAdmin    = "ADMIN".equals(role);
+        boolean showUsers  = isAdmin && "users".equals(view);
 
         if (showUsers) {
             List<User> users = new ArrayList<>();
@@ -47,19 +47,41 @@ public class DashboardServlet extends HttpServlet {
         String statusFilter = req.getParameter("status");
         List<Ticket> tickets = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT t.id,u.username,t.subject,t.status,t.created_at " +
+            "SELECT t.id,u.username,t.subject,t.status,t.assigned_role,t.created_at " +
             "FROM tickets t JOIN users u ON t.user_id=u.id");
         List<Object> params = new ArrayList<>();
+        boolean whereUsed = false;
 
         if ("USER".equals(role)) {
             sql.append(" WHERE t.user_id = ?");
             params.add(userId);
+            whereUsed = true;
         }
+
         if (statusFilter != null && !statusFilter.isEmpty()) {
-            sql.append(params.isEmpty() ? " WHERE " : " AND ")
-               .append("t.status = ?");
-            params.add(statusFilter);
+            switch (statusFilter) {
+                case "OPEN":
+                case "IN_PROGRESS":
+                case "RESOLVED":
+                case "CLOSED":
+                    sql.append(whereUsed ? " AND " : " WHERE ")
+                       .append("t.status = ?");
+                    params.add(statusFilter);
+                    whereUsed = true;
+                    break;
+                case "ASSIGNED_ADMIN":
+                    sql.append(whereUsed ? " AND " : " WHERE ")
+                       .append("t.assigned_role = 'ADMIN'");
+                    whereUsed = true;
+                    break;
+                case "ASSIGNED_SUPPORT":
+                    sql.append(whereUsed ? " AND " : " WHERE ")
+                       .append("t.assigned_role = 'SUPPORT'");
+                    whereUsed = true;
+                    break;
+            }
         }
+
         sql.append(" ORDER BY t.created_at DESC");
 
         try (Connection conn = DBConfig.getConnection();
@@ -74,6 +96,7 @@ public class DashboardServlet extends HttpServlet {
                     t.setUsername(rs.getString("username"));
                     t.setSubject(rs.getString("subject"));
                     t.setStatus(rs.getString("status"));
+                    t.setAssignedRole(rs.getString("assigned_role"));
                     t.setCreatedAt(rs.getTimestamp("created_at"));
                     tickets.add(t);
                 }
@@ -87,7 +110,6 @@ public class DashboardServlet extends HttpServlet {
         req.setAttribute("view", view);
         req.setAttribute("isAdmin", isAdmin);
         req.setAttribute("showUsers", showUsers);
-
         req.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp")
            .forward(req, resp);
     }

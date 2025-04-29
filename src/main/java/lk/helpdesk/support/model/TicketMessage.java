@@ -9,6 +9,7 @@ public class TicketMessage {
     private String senderUsername;
     private String message;
     private Timestamp createdAt;
+    private String senderRole;
 
     public TicketMessage() {}
 
@@ -42,4 +43,6 @@ public class TicketMessage {
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+    public String getSenderRole() { return senderRole; }
+    public void setSenderRole(String senderRole) { this.senderRole = senderRole; }
 }

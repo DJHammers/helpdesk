@@ -16,9 +16,7 @@ import java.util.List;
 public class EditUserServlet extends HttpServlet {
     private static final List<String> ROLES = Arrays.asList(
         "USER",
-        "SUPPORT_LEVEL_1",
-        "SUPPORT_LEVEL_2",
-        "SUPPORT_LEVEL_3",
+        "SUPPORT",
         "ADMIN"
     );
 

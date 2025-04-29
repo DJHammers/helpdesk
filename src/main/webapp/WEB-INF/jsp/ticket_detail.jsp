@@ -1,6 +1,7 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page session="false" contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List,lk.helpdesk.support.model.TicketMessage" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,49 +19,74 @@
       <div class="mt-2 text-sm text-gray-600">
         Status: <strong>${status}</strong>
         <c:if test="${not empty assignedRole}">
-          | Assigned to role: <strong>${assignedRole}</strong>
+          | Assigned to: <strong>${assignedRole}</strong>
         </c:if>
       </div>
 
-      <form action="${pageContext.request.contextPath}/tickets/assign" method="post"
-            class="mt-4 flex items-center space-x-2">
+      <form action="${pageContext.request.contextPath}/tickets/close" method="post" class="mt-4">
         <input type="hidden" name="ticketId" value="${ticketId}"/>
-        <label>Assign to role:</label>
-        <select name="assignedRole" required class="border px-2 py-1 rounded">
-          <c:forEach var="r" items="${roles}">
-            <option value="${r}" ${r==assignedRole?'selected':''}>${r}</option>
-          </c:forEach>
-        </select>
-        <button type="submit"
-                class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
-          Assign
+        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          Close Ticket
         </button>
       </form>
+
+      <c:if test="${status == 'CLOSED'}">
+        <form action="${pageContext.request.contextPath}/tickets/reopen" method="post" class="mt-2">
+          <input type="hidden" name="ticketId" value="${ticketId}"/>
+          <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+            Reopen Ticket
+          </button>
+        </form>
+      </c:if>
+
+      <c:if test="${role=='ADMIN' or role=='SUPPORT'}">
+        <form action="${pageContext.request.contextPath}/tickets/assign" method="post"
+              class="mt-4 flex items-center space-x-2">
+          <input type="hidden" name="ticketId" value="${ticketId}"/>
+          <label for="role" class="text-sm">Assign to:</label>
+          <select id="role" name="role" class="border px-2 py-1 rounded">
+            <option value="SUPPORT" ${assignedRole=='SUPPORT'?'selected':''}>SUPPORT</option>
+            <option value="ADMIN"   ${assignedRole=='ADMIN'  ?'selected':''}>ADMIN</option>
+          </select>
+          <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            Assign
+          </button>
+        </form>
+      </c:if>
     </div>
 
     <div class="space-y-4">
       <c:forEach var="m" items="${messages}">
+        <fmt:formatDate value="${m.createdAt}" pattern="yyyy-MM-dd HH:mm:ss" var="time"/>
         <div class="bg-white p-4 rounded shadow">
           <div class="text-sm text-gray-700">
-            <strong>${m.senderUsername}</strong>
-            <span class="ml-2 text-xs">${m.createdAt}</span>
+            <c:choose>
+              <c:when test="${m.senderRole=='USER'}">
+                <strong>User: ${m.senderUsername}</strong>
+              </c:when>
+              <c:otherwise>
+                <strong>Support Team ${m.senderRole}: ${m.senderUsername}</strong>
+              </c:otherwise>
+            </c:choose>
+            <span class="ml-2 text-xs">${time}</span>
           </div>
           <p class="mt-2">${m.message}</p>
         </div>
       </c:forEach>
     </div>
 
-    <form action="${pageContext.request.contextPath}/tickets/message" method="post"
-          class="mt-6 bg-white p-6 rounded shadow space-y-4">
-      <input type="hidden" name="ticketId" value="${ticketId}"/>
-      <textarea name="message" required
-                class="w-full border px-3 py-2 rounded h-24"
-                placeholder="Your message…"></textarea>
-      <button type="submit"
-              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-        Send Message
-      </button>
-    </form>
+    <c:if test="${status ne 'CLOSED'}">
+      <form action="${pageContext.request.contextPath}/tickets/message" method="post"
+            class="mt-6 bg-white p-6 rounded shadow space-y-4">
+        <input type="hidden" name="ticketId" value="${ticketId}"/>
+        <textarea name="message" required
+                  class="w-full border px-3 py-2 rounded h-24"
+                  placeholder="Your message…"></textarea>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Send Message
+        </button>
+      </form>
+    </c:if>
   </div>
 </body>
 </html>

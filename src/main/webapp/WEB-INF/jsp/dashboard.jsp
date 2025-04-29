@@ -36,7 +36,7 @@
 
   <main class="flex-1 p-8 overflow-auto">
     <c:choose>
-      <c:when test="${showUsers}">
+      <c:when test="${view=='users'}">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-semibold">Manage Users</h2>
           <a href="${pageContext.request.contextPath}/admin/users/add"
@@ -44,7 +44,7 @@
             Add User
           </a>
         </div>
-        <table class="min-w-full bg-white">
+        <table class="min-w-full bg-white border">
           <thead>
             <tr class="bg-gray-100">
               <th class="px-4 py-2 border">ID</th>
@@ -74,6 +74,9 @@
                 </td>
               </tr>
             </c:forEach>
+            <c:if test="${empty usersList}">
+              <tr><td colspan="5" class="text-center py-4 text-gray-500">No users found.</td></tr>
+            </c:if>
           </tbody>
         </table>
       </c:when>
@@ -96,29 +99,57 @@
             <option value="IN_PROGRESS"  ${statusFilter=='IN_PROGRESS'?'selected':''}>IN_PROGRESS</option>
             <option value="RESOLVED"     ${statusFilter=='RESOLVED'?'selected':''}>RESOLVED</option>
             <option value="CLOSED"       ${statusFilter=='CLOSED'?'selected':''}>CLOSED</option>
+            <c:if test="${isAdmin}">
+              <option value="ASSIGNED_ADMIN"   ${statusFilter=='ASSIGNED_ADMIN'?'selected':''}>
+                Assigned to Admin
+              </option>
+            </c:if>
+            <c:if test="${role=='SUPPORT'}">
+              <option value="ASSIGNED_SUPPORT" ${statusFilter=='ASSIGNED_SUPPORT'?'selected':''}>
+                Assigned to Support
+              </option>
+            </c:if>
           </select>
         </form>
-        <table class="min-w-full bg-white">
+        <table class="min-w-full bg-white border">
           <thead>
             <tr class="bg-gray-100">
               <th class="px-4 py-2 border">ID</th>
               <th class="px-4 py-2 border">User</th>
               <th class="px-4 py-2 border">Subject</th>
               <th class="px-4 py-2 border">Status</th>
+              <th class="px-4 py-2 border">Assigned Role</th>
+              <th class="px-4 py-2 border">Assign To</th>
               <th class="px-4 py-2 border">Created At</th>
             </tr>
           </thead>
           <tbody>
             <c:forEach var="t" items="${ticketsList}">
-              <tr onclick="location.href='${pageContext.request.contextPath}/tickets/view?id=${t.id}'"
-                  class="hover:bg-gray-50 cursor-pointer">
+              <tr class="hover:bg-gray-50">
                 <td class="border px-4 py-2">${t.id}</td>
                 <td class="border px-4 py-2">${t.username}</td>
                 <td class="border px-4 py-2">${t.subject}</td>
                 <td class="border px-4 py-2">${t.status}</td>
+                <td class="border px-4 py-2">${t.assignedRole}</td>
+                <td class="border px-4 py-2">
+                  <c:if test="${role=='ADMIN' or role=='SUPPORT'}">
+                    <form action="${pageContext.request.contextPath}/tickets/assign" method="post"
+                          class="flex items-center space-x-1">
+                      <input type="hidden" name="ticketId" value="${t.id}"/>
+                      <select name="role" class="border px-2 py-1 rounded">
+                        <option value="SUPPORT" ${t.assignedRole=='SUPPORT'?'selected':''}>SUPPORT</option>
+                        <option value="ADMIN"   ${t.assignedRole=='ADMIN'?'selected':''}>ADMIN</option>
+                      </select>
+                      <button type="submit" class="px-2 py-1 bg-green-600 text-white rounded">OK</button>
+                    </form>
+                  </c:if>
+                </td>
                 <td class="border px-4 py-2">${t.createdAt}</td>
               </tr>
             </c:forEach>
+            <c:if test="${empty ticketsList}">
+              <tr><td colspan="7" class="text-center py-4 text-gray-500">No tickets found.</td></tr>
+            </c:if>
           </tbody>
         </table>
       </c:otherwise>

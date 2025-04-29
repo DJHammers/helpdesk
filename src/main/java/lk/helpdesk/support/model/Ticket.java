@@ -7,16 +7,18 @@ public class Ticket {
     private String username;
     private String subject;
     private String status;
+    private String assignedRole;
     private Timestamp createdAt;
 
     public Ticket() {
     }
 
-    public Ticket(int id, String username, String subject, String status, Timestamp createdAt) {
+    public Ticket(int id, String username, String subject, String status, String assignedRole, Timestamp createdAt) {
         this.id = id;
         this.username = username;
         this.subject = subject;
         this.status = status;
+        this.assignedRole = assignedRole;
         this.createdAt = createdAt;
     }
 
@@ -46,6 +48,13 @@ public class Ticket {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAssignedRole() {
+        return assignedRole;
+    }
+    public void setAssignedRole(String assignedRole) {
+        this.assignedRole = assignedRole;
     }
 
     public Timestamp getCreatedAt() {

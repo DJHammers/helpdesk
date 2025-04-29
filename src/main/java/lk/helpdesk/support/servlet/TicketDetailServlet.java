@@ -12,11 +12,10 @@ import java.util.*;
 
 @WebServlet("/tickets/view")
 public class TicketDetailServlet extends HttpServlet {
-    private static final List<String> ROLES = Arrays.asList("USER","SUPPORT","ADMIN");
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         int ticketId;
         try {
             ticketId = Integer.parseInt(req.getParameter("id"));
@@ -25,13 +24,10 @@ public class TicketDetailServlet extends HttpServlet {
             return;
         }
 
-        String subject, status, assignedRole = null;
+        String subject, status, assignedRole;
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                "SELECT t.subject, t.status, u.role AS assigned_role "
-              + "FROM tickets t "
-              + "LEFT JOIN users u ON t.assigned_to = u.id "
-              + "WHERE t.id = ?")) {
+               "SELECT subject,status,assigned_role FROM tickets WHERE id=?")) {
             ps.setInt(1, ticketId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
@@ -50,16 +46,16 @@ public class TicketDetailServlet extends HttpServlet {
         req.setAttribute("subject",      subject);
         req.setAttribute("status",       status);
         req.setAttribute("assignedRole", assignedRole);
-        req.setAttribute("roles",        ROLES);
 
         List<TicketMessage> msgs = new ArrayList<>();
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                "SELECT m.id, m.ticket_id, m.sender_id, u.username, m.message, m.created_at "
-              + "FROM ticket_messages m "
-              + "JOIN users u ON m.sender_id = u.id "
-              + "WHERE m.ticket_id = ? "
-              + "ORDER BY m.created_at ASC")) {
+               "SELECT m.id,m.ticket_id,m.sender_id,u.username,u.role AS sender_role," +
+               "m.message,m.created_at " +
+               "FROM ticket_messages m " +
+               "JOIN users u ON m.sender_id=u.id " +
+               "WHERE m.ticket_id=? " +
+               "ORDER BY m.created_at DESC")) {
             ps.setInt(1, ticketId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -68,6 +64,7 @@ public class TicketDetailServlet extends HttpServlet {
                     m.setTicketId(rs.getInt("ticket_id"));
                     m.setSenderId(rs.getInt("sender_id"));
                     m.setSenderUsername(rs.getString("username"));
+                    m.setSenderRole(rs.getString("sender_role"));
                     m.setMessage(rs.getString("message"));
                     m.setCreatedAt(rs.getTimestamp("created_at"));
                     msgs.add(m);
