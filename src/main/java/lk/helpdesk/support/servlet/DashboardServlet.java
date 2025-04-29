@@ -9,8 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
@@ -19,13 +18,16 @@ public class DashboardServlet extends HttpServlet {
             throws ServletException, IOException {
         Integer userId = (Integer) req.getAttribute("userId");
         String  role   = (String)  req.getAttribute("role");
-        
-        boolean showUsers = "ADMIN".equals(role) && "users".equals(req.getParameter("view"));
+
+        String view = req.getParameter("view") == null ? "tickets" : req.getParameter("view");
+        boolean isAdmin     = "ADMIN".equals(role);
+        boolean showUsers   = isAdmin && "users".equals(view);
+
         if (showUsers) {
             List<User> users = new ArrayList<>();
-            String uSql = "SELECT id,username,email,role,created_at FROM users";
             try (Connection conn = DBConfig.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(uSql);
+                 PreparedStatement ps = conn.prepareStatement(
+                     "SELECT id,username,email,role,created_at FROM users");
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     User u = new User();
@@ -44,22 +46,20 @@ public class DashboardServlet extends HttpServlet {
 
         String statusFilter = req.getParameter("status");
         List<Ticket> tickets = new ArrayList<>();
-        StringBuilder sql = new StringBuilder()
-            .append("SELECT t.id,u.username,t.subject,t.status,t.created_at ")
-            .append("FROM tickets t JOIN users u ON t.user_id=u.id");
+        StringBuilder sql = new StringBuilder(
+            "SELECT t.id,u.username,t.subject,t.status,t.created_at " +
+            "FROM tickets t JOIN users u ON t.user_id=u.id");
         List<Object> params = new ArrayList<>();
 
         if ("USER".equals(role)) {
             sql.append(" WHERE t.user_id = ?");
             params.add(userId);
         }
-
         if (statusFilter != null && !statusFilter.isEmpty()) {
             sql.append(params.isEmpty() ? " WHERE " : " AND ")
                .append("t.status = ?");
             params.add(statusFilter);
         }
-
         sql.append(" ORDER BY t.created_at DESC");
 
         try (Connection conn = DBConfig.getConnection();
@@ -84,6 +84,8 @@ public class DashboardServlet extends HttpServlet {
 
         req.setAttribute("ticketsList", tickets);
         req.setAttribute("statusFilter", statusFilter == null ? "" : statusFilter);
+        req.setAttribute("view", view);
+        req.setAttribute("isAdmin", isAdmin);
         req.setAttribute("showUsers", showUsers);
 
         req.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp")

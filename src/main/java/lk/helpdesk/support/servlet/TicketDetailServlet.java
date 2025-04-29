@@ -12,19 +12,11 @@ import java.util.*;
 
 @WebServlet("/tickets/view")
 public class TicketDetailServlet extends HttpServlet {
-    private static final List<String> ROLES = Arrays.asList(
-        "USER","SUPPORT","ADMIN"
-    );
+    private static final List<String> ROLES = Arrays.asList("USER","SUPPORT","ADMIN");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Integer userId = (Integer) req.getAttribute("userId");
-        if (userId == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
         int ticketId;
         try {
             ticketId = Integer.parseInt(req.getParameter("id"));
@@ -36,7 +28,10 @@ public class TicketDetailServlet extends HttpServlet {
         String subject, status, assignedRole = null;
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-               "SELECT subject,status,assigned_role FROM tickets WHERE id = ?")) {
+                "SELECT t.subject, t.status, u.role AS assigned_role "
+              + "FROM tickets t "
+              + "LEFT JOIN users u ON t.assigned_to = u.id "
+              + "WHERE t.id = ?")) {
             ps.setInt(1, ticketId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
@@ -60,9 +55,11 @@ public class TicketDetailServlet extends HttpServlet {
         List<TicketMessage> msgs = new ArrayList<>();
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-               "SELECT m.id,m.ticket_id,m.sender_id,u.username,m.message,m.created_at " +
-               "FROM ticket_messages m JOIN users u ON m.sender_id=u.id " +
-               "WHERE m.ticket_id=? ORDER BY m.created_at ASC")) {
+                "SELECT m.id, m.ticket_id, m.sender_id, u.username, m.message, m.created_at "
+              + "FROM ticket_messages m "
+              + "JOIN users u ON m.sender_id = u.id "
+              + "WHERE m.ticket_id = ? "
+              + "ORDER BY m.created_at ASC")) {
             ps.setInt(1, ticketId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

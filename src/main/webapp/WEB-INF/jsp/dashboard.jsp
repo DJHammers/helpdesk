@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page session="false" contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List,lk.helpdesk.support.model.User,lk.helpdesk.support.model.Ticket" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -15,12 +15,12 @@
       <div class="p-6"><h2 class="text-xl font-bold">Helpdesk</h2></div>
       <nav class="mt-6">
         <a href="${pageContext.request.contextPath}/dashboard?view=tickets"
-           class="block py-2 px-6 hover:bg-gray-200 ${!showUsers?'bg-gray-200':''}">
+           class="block py-2 px-6 hover:bg-gray-200 ${view=='tickets'?'bg-gray-200':''}">
           View Tickets
         </a>
-        <c:if test="${showUsers}">
+        <c:if test="${isAdmin}">
           <a href="${pageContext.request.contextPath}/dashboard?view=users"
-             class="block py-2 px-6 hover:bg-gray-200 ${showUsers?'bg-gray-200':''}">
+             class="block py-2 px-6 hover:bg-gray-200 ${view=='users'?'bg-gray-200':''}">
             Manage Users
           </a>
         </c:if>
@@ -93,9 +93,7 @@
           <select name="status" onchange="this.form.submit()" class="border px-2 py-1 rounded">
             <option value=""  ${statusFilter==''?'selected':''}>All</option>
             <option value="OPEN"         ${statusFilter=='OPEN'?'selected':''}>OPEN</option>
-            <option value="IN_PROGRESS"  ${statusFilter=='IN_PROGRESS'?'selected':''}>
-              IN_PROGRESS
-            </option>
+            <option value="IN_PROGRESS"  ${statusFilter=='IN_PROGRESS'?'selected':''}>IN_PROGRESS</option>
             <option value="RESOLVED"     ${statusFilter=='RESOLVED'?'selected':''}>RESOLVED</option>
             <option value="CLOSED"       ${statusFilter=='CLOSED'?'selected':''}>CLOSED</option>
           </select>
