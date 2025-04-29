@@ -9,6 +9,9 @@ public class Ticket {
     private String status;
     private Timestamp createdAt;
 
+    public Ticket() {
+    }
+
     public Ticket(int id, String username, String subject, String status, Timestamp createdAt) {
         this.id = id;
         this.username = username;
@@ -17,9 +20,38 @@ public class Ticket {
         this.createdAt = createdAt;
     }
 
-    public int getId() { return id; }
-    public String getUsername() { return username; }
-    public String getSubject() { return subject; }
-    public String getStatus() { return status; }
-    public Timestamp getCreatedAt() { return createdAt; }
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 }

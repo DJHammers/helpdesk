@@ -15,58 +15,56 @@ public class JwtAuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest rq, ServletResponse rs, FilterChain chain)
             throws IOException, ServletException {
-        HttpServletRequest  request  = (HttpServletRequest) rq;
-        HttpServletResponse response = (HttpServletResponse) rs;
+        HttpServletRequest  req  = (HttpServletRequest) rq;
+        HttpServletResponse resp = (HttpServletResponse) rs;
+        String ctx        = req.getContextPath();
+        String servlet    = req.getServletPath();
+        String token      = null;
 
-        String ctx  = request.getContextPath();
-        String path = request.getRequestURI().substring(ctx.length());
-
-        String token = null;
-        if (request.getCookies() != null) {
-            for (Cookie c : request.getCookies()) {
+        if (req.getCookies() != null) {
+            for (Cookie c : req.getCookies()) {
                 if ("AUTH_TOKEN".equals(c.getName())) {
                     token = c.getValue();
                     break;
                 }
             }
         }
-        if (path.equals("/") ||
-            path.startsWith("/login") ||
-            path.startsWith("/register")) {
 
+        boolean isPublic = servlet.equals("/login") || servlet.equals("/register") || servlet.equals("/logout");
+
+        if (isPublic) {
             if (token != null) {
                 try {
                     JwtUtil.parseToken(token);
-                    response.sendRedirect(ctx + "/dashboard");
+                    resp.sendRedirect(ctx + "/dashboard");
                     return;
                 } catch (JwtException e) {
                     Cookie expired = new Cookie("AUTH_TOKEN", "");
-                    expired.setMaxAge(0);
                     expired.setPath(ctx.isEmpty() ? "/" : ctx);
-                    response.addCookie(expired);
+                    expired.setMaxAge(0);
+                    resp.addCookie(expired);
                 }
             }
-            chain.doFilter(request, response);
+            chain.doFilter(req, resp);
             return;
         }
-
         if (token == null) {
-            response.sendRedirect(ctx + "/login");
+            resp.sendRedirect(ctx + "/login");
             return;
         }
 
         try {
             Jws<Claims> claims = JwtUtil.parseToken(token);
-            request.setAttribute("userId",   claims.getBody().get("userId", Integer.class));
-            request.setAttribute("username", claims.getBody().getSubject());
-            request.setAttribute("role",     claims.getBody().get("role", String.class));
-            chain.doFilter(request, response);
+            req.setAttribute("userId",   claims.getBody().get("userId", Integer.class));
+            req.setAttribute("username", claims.getBody().getSubject());
+            req.setAttribute("role",     claims.getBody().get("role", String.class));
+            chain.doFilter(req, resp);
         } catch (JwtException e) {
             Cookie expired = new Cookie("AUTH_TOKEN", "");
-            expired.setMaxAge(0);
             expired.setPath(ctx.isEmpty() ? "/" : ctx);
-            response.addCookie(expired);
-            response.sendRedirect(ctx + "/login?error=expired");
+            expired.setMaxAge(0);
+            resp.addCookie(expired);
+            resp.sendRedirect(ctx + "/login?error=expired");
         }
     }
 }

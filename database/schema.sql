@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(60) NOT NULL,
-    role ENUM('USER','SUPPORT_LEVEL_1','SUPPORT_LEVEL_2','SUPPORT_LEVEL_3','ADMIN') NOT NULL DEFAULT 'USER',
+    role ENUM('USER','SUPPORT','ADMIN') NOT NULL DEFAULT 'USER',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -27,3 +27,13 @@ CREATE TABLE IF NOT EXISTS tickets (
 UPDATE ticket_system.users
 SET role = 'ADMIN'
 WHERE username = 'add_your_username';
+
+CREATE TABLE IF NOT EXISTS ticket_messages (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  ticket_id    INT NOT NULL,
+  sender_id    INT NOT NULL,
+  message      TEXT NOT NULL,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+);
