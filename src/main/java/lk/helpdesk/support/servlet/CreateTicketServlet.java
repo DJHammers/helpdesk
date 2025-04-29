@@ -22,9 +22,14 @@ public class CreateTicketServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         int userId = (Integer) req.getAttribute("userId");
-        String subject     = req.getParameter("subject");
+        String subject = req.getParameter("subject");
         String description = req.getParameter("description");
-        String sql = "INSERT INTO tickets(user_id,subject,description) VALUES (?,?,?)";
+
+        if (description.length() > 1000) {
+            description = description.substring(0, 1000);
+        }
+
+        String sql = "INSERT INTO tickets(user_id, subject, description) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
