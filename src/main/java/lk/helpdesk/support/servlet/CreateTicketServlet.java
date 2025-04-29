@@ -19,28 +19,32 @@ public class CreateTicketServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        int userId = (Integer) req.getAttribute("userId");
-        String subject = req.getParameter("subject");
-        String description = req.getParameter("description");
+protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+    int userId = (Integer) req.getAttribute("userId");
+    String subject = req.getParameter("subject");
+    String description = req.getParameter("description");
 
-        if (description.length() > 1000) {
-            description = description.substring(0, 1000);
-        }
+    if (subject.length() > 100) {
+        subject = subject.substring(0, 100);
+    }
 
-        String sql = "INSERT INTO tickets(user_id, subject, description) VALUES (?, ?, ?)";
+    if (description.length() > 1000) {
+        description = description.substring(0, 1000);
+    }
 
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setString(2, subject);
-            ps.setString(3, description);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        }
+    String sql = "INSERT INTO tickets(user_id, subject, description) VALUES (?, ?, ?)";
 
-        resp.sendRedirect(req.getContextPath() + "/dashboard?view=tickets");
+    try (Connection conn = DBConfig.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ps.setString(2, subject);
+        ps.setString(3, description);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        throw new ServletException(e);
+    }
+
+    resp.sendRedirect(req.getContextPath() + "/dashboard?view=tickets");
     }
 }
