@@ -13,7 +13,6 @@
   <title>Ticket #${ticketId}</title>
 
   <script>
-    // live counter for message box (1000)
     function updMsg() {
       const m = document.getElementById('message');
       document.getElementById('msgCount').textContent = m.value.length + '/1000';
@@ -25,13 +24,12 @@
 <body class="bg-gray-50 min-h-screen">
   <div class="max-w-4xl mx-auto p-6">
 
-    <!-- Back link -->
     <a href="${pageContext.request.contextPath}/dashboard?view=tickets"
        class="inline-flex items-center text-sm font-medium text-blue-600 hover:underline mb-6">
       ← Back to Tickets
     </a>
 
-    <!-- Ticket header -->
+    <!-- ░░ Ticket header ░░ -->
     <div class="bg-white rounded-2xl shadow p-6 mb-6">
       <h1 class="text-2xl font-semibold mb-2 break-words whitespace-pre-line">
         Ticket #${ticketId}: ${subject}
@@ -44,26 +42,54 @@
         </c:if>
       </div>
 
-      <!-- Action buttons (close / reopen / assign) -->
+      <!-- ░░ Action buttons ░░ -->
       <div class="flex flex-wrap items-center space-x-2">
-        <form action="${pageContext.request.contextPath}/tickets/close" method="post" class="inline">
-          <input type="hidden" name="ticketId" value="${ticketId}" />
-          <button type="submit"
-                  class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium">
-            Close Ticket
-          </button>
-        </form>
 
-        <c:if test="${status == 'Closed'}">
-          <form action="${pageContext.request.contextPath}/tickets/reopen" method="post" class="inline">
+        <!-- Close (always visible when not closed) -->
+        <c:if test="${status ne 'Closed'}">
+          <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
             <input type="hidden" name="ticketId" value="${ticketId}" />
-            <button type="submit"
-                    class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm font-medium">
+            <input type="hidden" name="status"   value="Closed" />
+            <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium">
+              Close Ticket
+            </button>
+          </form>
+        </c:if>
+
+        <!-- NEW ░░ In Progress ░░ -->
+        <c:if test="${status == 'Open' and (role=='Admin' or role=='Support')}">
+          <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
+            <input type="hidden" name="ticketId" value="${ticketId}" />
+            <input type="hidden" name="status"   value="In_Progress" />
+            <button class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium">
+              Mark In&nbsp;Progress
+            </button>
+          </form>
+        </c:if>
+
+        <!-- NEW ░░ Resolved ░░ -->
+        <c:if test="${status == 'In_Progress' and (role=='Admin' or role=='Support')}">
+          <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
+            <input type="hidden" name="ticketId" value="${ticketId}" />
+            <input type="hidden" name="status"   value="Resolved" />
+            <button class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium">
+              Mark Resolved
+            </button>
+          </form>
+        </c:if>
+
+        <!-- Re-open (only when closed) -->
+        <c:if test="${status == 'Closed'}">
+          <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
+            <input type="hidden" name="ticketId" value="${ticketId}" />
+            <input type="hidden" name="status"   value="Open" />
+            <button class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm font-medium">
               Reopen Ticket
             </button>
           </form>
         </c:if>
 
+        <!-- Assign-role dropdown (unchanged) -->
         <c:if test="${role=='Admin' or role=='Support'}">
           <form action="${pageContext.request.contextPath}/tickets/assign" method="post"
                 class="ml-4 flex items-center space-x-2">
@@ -74,16 +100,16 @@
               <option value="Support" ${assignedRole=='Support' ? 'selected' : ''}>Support</option>
               <option value="Admin"   ${assignedRole=='Admin'   ? 'selected' : ''}>Admin</option>
             </select>
-            <button type="submit"
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+            <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
               Assign
             </button>
           </form>
         </c:if>
+
       </div>
     </div>
 
-    <!-- Message history -->
+    <!-- ░░ Message history ░░ -->
     <div class="space-y-4">
       <c:forEach var="m" items="${messages}">
         <fmt:formatDate value="${m.createdAt}" pattern="yyyy-MM-dd HH:mm:ss" var="time" />
@@ -105,7 +131,7 @@
       </c:forEach>
     </div>
 
-    <!-- New message form (hidden when ticket closed) -->
+    <!-- ░░ New message form ░░ -->
     <c:if test="${status ne 'Closed'}">
       <form action="${pageContext.request.contextPath}/tickets/message"
             method="post"
@@ -125,8 +151,7 @@
                   class="w-full rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 whitespace-pre-line break-words"
                   placeholder="Your message…"></textarea>
 
-        <button type="submit"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
           Send Message
         </button>
       </form>
