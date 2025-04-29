@@ -63,7 +63,7 @@ public class DashboardServlet extends HttpServlet {
                 case "Open":
                 case "In_Progress":
                 case "Resolved":
-                case "Close":
+                case "Closed":
                     sql.append(whereUsed ? " AND " : " WHERE ")
                        .append("t.status = ?");
                     params.add(statusFilter);
