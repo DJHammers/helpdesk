@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,25 +9,36 @@
   <title>Register</title>
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
-  <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg">
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8">
     <h2 class="text-2xl font-bold mb-6 text-center">Create Account</h2>
-    <form method="post" action="${pageContext.request.contextPath}/register" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium">Username</label>
-        <input name="username" type="text" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+    <form method="post" action="${pageContext.request.contextPath}/register" class="space-y-5">
+      <div class="space-y-1">
+        <label for="username" class="text-sm font-medium text-gray-700">Username</label>
+        <input id="username" name="username" type="text" required
+               class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
       </div>
-      <div>
-        <label class="block text-sm font-medium">Email</label>
-        <input name="email" type="email" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      <div class="space-y-1">
+        <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+        <input id="email" name="email" type="email" required
+               class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
       </div>
-      <div>
-        <label class="block text-sm font-medium">Password</label>
-        <input name="password" type="password" required class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      <div class="space-y-1">
+        <label for="password" class="text-sm font-medium text-gray-700">Password</label>
+        <input id="password" name="password" type="password" required
+               class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
       </div>
-      <button type="submit" class="w-full py-2 mt-4 font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Register</button>
+      <button type="submit"
+              class="w-full rounded-lg bg-blue-600 py-2 font-semibold text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        Register
+      </button>
     </form>
-    <c:if test="${not empty error}"><p class="mt-4 text-red-600 text-sm">${error}</p></c:if>
-    <p class="mt-6 text-sm text-center">Already have an account? <a href="${pageContext.request.contextPath}/login" class="text-blue-600 hover:underline">Sign in</a></p>
+    <c:if test="${not empty error}">
+      <p class="mt-4 text-center text-red-600 text-sm">${error}</p>
+    </c:if>
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Already have an account?
+      <a href="${pageContext.request.contextPath}/login" class="font-medium text-blue-600 hover:underline">Sign in</a>
+    </p>
   </div>
 </body>
 </html>
