@@ -16,7 +16,7 @@
         <aside class="w-64 bg-white border-r flex flex-col justify-between">
           <div>
             <div class="p-6">
-              <h2 class="text-2xl font-bold">Helpdesk</h2>
+              <h2 class="text-2xl font-bold">Help Desk</h2>
             </div>
             <!-- Reduced spacing for a tighter nav -->
             <nav class="mt-6 space-y-2">
