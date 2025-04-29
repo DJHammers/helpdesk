@@ -17,15 +17,9 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        HttpSession session = req.getSession(false);
-        Integer userId = session == null ? null : (Integer) session.getAttribute("userId");
-        String  role   = session == null ? null : (String)  session.getAttribute("role");
-
-        if (userId == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
-            return;
-        }
-
+        Integer userId = (Integer) req.getAttribute("userId");
+        String  role   = (String)  req.getAttribute("role");
+        
         boolean showUsers = "ADMIN".equals(role) && "users".equals(req.getParameter("view"));
         if (showUsers) {
             List<User> users = new ArrayList<>();
@@ -50,21 +44,19 @@ public class DashboardServlet extends HttpServlet {
 
         String statusFilter = req.getParameter("status");
         List<Ticket> tickets = new ArrayList<>();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT t.id,u.username,t.subject,t.status,t.created_at ")
-           .append("FROM tickets t JOIN users u ON t.user_id=u.id");
+        StringBuilder sql = new StringBuilder()
+            .append("SELECT t.id,u.username,t.subject,t.status,t.created_at ")
+            .append("FROM tickets t JOIN users u ON t.user_id=u.id");
         List<Object> params = new ArrayList<>();
 
-        boolean whereUsed = false;
         if ("USER".equals(role)) {
             sql.append(" WHERE t.user_id = ?");
             params.add(userId);
-            whereUsed = true;
         }
 
         if (statusFilter != null && !statusFilter.isEmpty()) {
-            sql.append(whereUsed ? " AND " : " WHERE ");
-            sql.append("t.status = ?");
+            sql.append(params.isEmpty() ? " WHERE " : " AND ")
+               .append("t.status = ?");
             params.add(statusFilter);
         }
 
