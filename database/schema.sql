@@ -48,3 +48,13 @@ CREATE TABLE IF NOT EXISTS ticket_messages (
   FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Feedback table
+CREATE TABLE feedback (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT NOT NULL,
+    message     TEXT      NOT NULL,
+    rating      TINYINT   NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
