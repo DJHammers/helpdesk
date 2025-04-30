@@ -32,10 +32,22 @@
           </a>
         </c:if>
 
-        <!-- NEW  My Profile Link -->
+        <!-- NEW My Profile Link -->
         <a href="${pageContext.request.contextPath}/profile"
            class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100">
           My Profile
+        </a>
+        
+        <!-- NEW FeedBack -->
+        <a href="${pageContext.request.contextPath}/feedback"
+           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100">
+          Feedback
+        </a>
+           
+        <!-- NEW FeedBack -->
+        <a href="${pageContext.request.contextPath}/viewFeedback"
+           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100">
+          View Feedback
         </a>
       </nav>
     </div>
