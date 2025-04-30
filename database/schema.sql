@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS ticket_system;
 USE ticket_system;
 
+-- users table
 CREATE TABLE IF NOT EXISTS users (
     id             INT AUTO_INCREMENT PRIMARY KEY,
     username       VARCHAR(50)   NOT NULL UNIQUE,
@@ -13,6 +14,18 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- user avatars table
+CREATE TABLE IF NOT EXISTS user_avatars (
+    user_id        INT PRIMARY KEY,
+    mime_type      VARCHAR(100)  NOT NULL,
+    original_name  VARCHAR(255)  NOT NULL,
+    img_blob       LONGBLOB      NOT NULL,
+    uploaded_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_avatar_user FOREIGN KEY (user_id)
+        REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- tickets table
 CREATE TABLE IF NOT EXISTS tickets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -25,11 +38,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- for the first time setup
-UPDATE ticket_system.users
-SET role = 'Admin'
-WHERE username = 'add_your_username';
-
+-- ticket messages table
 CREATE TABLE IF NOT EXISTS ticket_messages (
   id           INT AUTO_INCREMENT PRIMARY KEY,
   ticket_id    INT NOT NULL,
@@ -38,14 +47,4 @@ CREATE TABLE IF NOT EXISTS ticket_messages (
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS user_avatars (
-    user_id        INT PRIMARY KEY,
-    mime_type      VARCHAR(100)  NOT NULL,
-    original_name  VARCHAR(255)  NOT NULL,
-    img_blob       LONGBLOB      NOT NULL,
-    uploaded_at    TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_avatar_user FOREIGN KEY (user_id)
-        REFERENCES users(id) ON DELETE CASCADE
 );
