@@ -2,7 +2,6 @@ package lk.helpdesk.support.servlet;
 
 import lk.helpdesk.support.config.DBConfig;
 import lk.helpdesk.support.model.TicketMessage;
-import lk.helpdesk.support.model.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +12,6 @@ import java.util.*;
 
 @WebServlet("/tickets/view")
 public class TicketDetailServlet extends HttpServlet {
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -26,17 +24,11 @@ public class TicketDetailServlet extends HttpServlet {
             return;
         }
 
-        String subject       = null;
-        String status        = null;
-        String assignedRole  = null;
-
+        String subject, status, assignedRole;
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                 "SELECT subject, status, assigned_role " +
-                 "FROM tickets WHERE id = ?")) {
-
+               "SELECT subject,status,assigned_role FROM tickets WHERE id=?")) {
             ps.setInt(1, ticketId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -50,20 +42,21 @@ public class TicketDetailServlet extends HttpServlet {
             throw new ServletException(e);
         }
 
-        List<TicketMessage> msgs = new ArrayList<>();
+        req.setAttribute("ticketId",     ticketId);
+        req.setAttribute("subject",      subject);
+        req.setAttribute("status",       status);
+        req.setAttribute("assignedRole", assignedRole);
 
+        List<TicketMessage> msgs = new ArrayList<>();
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-                 "SELECT m.id, m.ticket_id, m.sender_id, " +
-                 "       u.username, u.role      AS sender_role, " +
-                 "       m.message, m.created_at " +
-                 "FROM   ticket_messages m " +
-                 "JOIN   users u ON m.sender_id = u.id " +
-                 "WHERE  m.ticket_id = ? " +
-                 "ORDER  BY m.created_at")) {
-
+               "SELECT m.id,m.ticket_id,m.sender_id,u.username,u.role AS sender_role," +
+               "m.message,m.created_at " +
+               "FROM ticket_messages m " +
+               "JOIN users u ON m.sender_id=u.id " +
+               "WHERE m.ticket_id=? " +
+               "ORDER BY m.created_at DESC")) {
             ps.setInt(1, ticketId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     TicketMessage m = new TicketMessage();
@@ -81,16 +74,7 @@ public class TicketDetailServlet extends HttpServlet {
             throw new ServletException(e);
         }
 
-        User current = (User) req.getSession().getAttribute("user");
-        String role  = (current == null ? "Guest" : current.getRole());
-
-        req.setAttribute("ticketId",     ticketId);
-        req.setAttribute("subject",      subject);
-        req.setAttribute("status",       status);
-        req.setAttribute("assignedRole", assignedRole == null ? "" : assignedRole);
-        req.setAttribute("messages",     msgs);
-        req.setAttribute("role",         role);
-
+        req.setAttribute("messages", msgs);
         req.getRequestDispatcher("/WEB-INF/jsp/ticket_detail.jsp")
            .forward(req, resp);
     }
