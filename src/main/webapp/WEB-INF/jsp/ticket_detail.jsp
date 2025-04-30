@@ -112,18 +112,27 @@
     <!-- ░░ Message history ░░ -->
     <div class="space-y-4">
       <c:forEach var="m" items="${messages}">
-        <fmt:formatDate value="${m.createdAt}" pattern="yyyy-MM-dd HH:mm:ss" var="time" />
         <div class="bg-white rounded-2xl shadow p-4">
-          <div class="flex justify-between items-center">
-            <div class="text-sm text-gray-700 font-medium">
-              <c:choose>
-                <c:when test="${m.senderRole=='User'}">User</c:when>
-                <c:otherwise>${m.senderRole}</c:otherwise>
-              </c:choose>
-              : ${m.senderUsername}
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2 text-sm text-gray-700 font-medium">
+              <!-- profile picture -->
+              <img src="${pageContext.request.contextPath}/avatar?id=${m.senderId}"
+                   class="w-10 h-10 rounded-full object-cover" alt="avatar"/>
+              <!-- username + role -->
+              <span>
+                <c:choose>
+                  <c:when test="${m.senderRole=='User'}">User</c:when>
+                  <c:otherwise>${m.senderRole}</c:otherwise>
+                </c:choose>
+                : ${m.senderUsername}
+              </span>
             </div>
-            <div class="text-xs text-gray-500">${time}</div>
+            <!-- timestamp -->
+            <div class="text-xs text-gray-500">
+              <fmt:formatDate value="${m.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/>
+            </div>
           </div>
+
           <div class="mt-2 text-gray-800 whitespace-pre-line break-words">
             ${fn:length(m.message) > 1000 ? fn:substring(m.message, 0, 1000) : m.message}
           </div>

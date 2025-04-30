@@ -17,18 +17,21 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         Integer userId = (Integer) req.getAttribute("userId");
-        String role    = (String)  req.getAttribute("role");
-        String view    = req.getParameter("view") == null ? "tickets" : req.getParameter("view");
-        boolean isAdmin    = "Admin".equals(role);
-        boolean showUsers  = isAdmin && "users".equals(view);
+        String  role   = (String)  req.getAttribute("role");
+        String  view   = req.getParameter("view") == null ? "tickets" : req.getParameter("view");
+
+        boolean isAdmin   = "Admin".equals(role);
+        boolean showUsers = isAdmin && "users".equals(view);
 
         if (showUsers) {
             List<User> users = new ArrayList<>();
             try (Connection conn = DBConfig.getConnection();
                  PreparedStatement ps = conn.prepareStatement(
-                     "SELECT id,username,email,role,created_at FROM users");
+                         "SELECT id, username, email, role, created_at FROM users");
                  ResultSet rs = ps.executeQuery()) {
+
                 while (rs.next()) {
                     User u = new User();
                     u.setId(rs.getInt("id"));
@@ -46,9 +49,12 @@ public class DashboardServlet extends HttpServlet {
 
         String statusFilter = req.getParameter("status");
         List<Ticket> tickets = new ArrayList<>();
+
         StringBuilder sql = new StringBuilder(
-            "SELECT t.id,u.username,t.subject,t.status,t.assigned_role,t.created_at " +
-            "FROM tickets t JOIN users u ON t.user_id=u.id");
+            "SELECT t.id, t.user_id AS userId, u.username, " +
+            "       t.subject, t.status, t.assigned_role, t.created_at " +
+            "FROM tickets t JOIN users u ON t.user_id = u.id");
+
         List<Object> params = new ArrayList<>();
         boolean whereUsed = false;
 
@@ -86,13 +92,16 @@ public class DashboardServlet extends HttpServlet {
 
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Ticket t = new Ticket();
                     t.setId(rs.getInt("id"));
+                    t.setUserId(rs.getInt("userId"));
                     t.setUsername(rs.getString("username"));
                     t.setSubject(rs.getString("subject"));
                     t.setStatus(rs.getString("status"));
@@ -105,11 +114,12 @@ public class DashboardServlet extends HttpServlet {
             throw new ServletException("Error loading tickets", e);
         }
 
-        req.setAttribute("ticketsList", tickets);
+        req.setAttribute("ticketsList",  tickets);
         req.setAttribute("statusFilter", statusFilter == null ? "" : statusFilter);
-        req.setAttribute("view", view);
-        req.setAttribute("isAdmin", isAdmin);
-        req.setAttribute("showUsers", showUsers);
+        req.setAttribute("view",        view);
+        req.setAttribute("isAdmin",     isAdmin);
+        req.setAttribute("showUsers",   showUsers);
+
         req.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp")
            .forward(req, resp);
     }

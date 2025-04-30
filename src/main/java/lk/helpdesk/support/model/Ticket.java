@@ -10,6 +10,7 @@ public class Ticket {
     private String assignedRole;
     private Timestamp createdAt;
 
+    private int userId;
     public Ticket() {
     }
 
@@ -62,5 +63,12 @@ public class Ticket {
     }
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public int    getUserId(){ 
+        return userId; 
+    }
+    public void   setUserId(int id) { 
+        this.userId = id; 
     }
 }
