@@ -11,6 +11,29 @@ import java.util.List;
 public class UserDAO {
     public static final int PAGE_SIZE = 20;
     
+    public static class AvatarData {
+    public final String mimeType;
+    public final byte[] bytes;
+    AvatarData(String mimeType, byte[] bytes) {
+        this.mimeType = mimeType;
+        this.bytes = bytes;
+    }
+}
+
+public AvatarData loadAvatar(int userId) throws SQLException {
+    String sql = "SELECT mime_type, img_blob FROM user_avatars WHERE user_id = ?";
+    try (Connection c = DBConfig.getConnection();
+         PreparedStatement ps = c.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (!rs.next()) return null;
+            String mime  = rs.getString("mime_type");
+            byte[] bytes = rs.getBytes("img_blob");
+            return new AvatarData(mime, bytes);
+        }
+    }
+}
+    
     public User findByUsername(String username) throws SQLException {
         String sql =
             "SELECT id, username, email, password_hash, role, " +
