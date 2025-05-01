@@ -21,7 +21,7 @@
                 class="w-full h-32 border rounded p-2 mb-4"
                 placeholder="Your feedback..."></textarea>
 
-      <!-- Star Rating -->
+
       <div id="star-rating" class="flex space-x-1 mb-6">
         <c:forEach var="i" begin="1" end="5">
           <label>
@@ -73,14 +73,13 @@
         });
       }
 
-      // When a radio changes, recolor
       inputs.forEach(input =>
         input.addEventListener('change', e =>
           updateStars(parseInt(e.target.value, 10))
         )
       );
 
-      // Initialize on page load
+
       const checked = document.querySelector('input[name="rating"]:checked');
       if (checked) {
         updateStars(parseInt(checked.value, 10));
