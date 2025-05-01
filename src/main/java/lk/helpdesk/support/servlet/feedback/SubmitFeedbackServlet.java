@@ -15,7 +15,7 @@ public class SubmitFeedbackServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // preserve admin flag for sidebar
+
         String role = (String) req.getAttribute("role");
         boolean isAdmin = "Admin".equals(role);
         req.setAttribute("isAdmin", isAdmin);

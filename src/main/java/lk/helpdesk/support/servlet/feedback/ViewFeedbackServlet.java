@@ -22,7 +22,6 @@ public class ViewFeedbackServlet extends HttpServlet {
         boolean isAdmin = "Admin".equals(role);
         req.setAttribute("isAdmin", isAdmin);
 
-        // 1) Determine page number
         int page = 1;
         String pageParam = req.getParameter("page");
         if (pageParam != null) {
@@ -31,7 +30,6 @@ public class ViewFeedbackServlet extends HttpServlet {
         }
         int offset = (page - 1) * PAGE_SIZE;
 
-        // 2) Total count
         int totalCount = 0;
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement psCount = conn.prepareStatement("SELECT COUNT(*) FROM feedback");
@@ -44,7 +42,6 @@ public class ViewFeedbackServlet extends HttpServlet {
         }
         int totalPages = (totalCount + PAGE_SIZE - 1) / PAGE_SIZE;
 
-        // 3) Load one page of feedback
         List<Feedback> feedbackList = new ArrayList<>();
         String sql =
             "SELECT f.id, f.user_id, u.username, f.message, f.rating, f.created_at " +
@@ -72,7 +69,6 @@ public class ViewFeedbackServlet extends HttpServlet {
             throw new ServletException("Unable to load feedback", e);
         }
 
-        // 4) Push into request
         req.setAttribute("feedbackList", feedbackList);
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPages", totalPages);
