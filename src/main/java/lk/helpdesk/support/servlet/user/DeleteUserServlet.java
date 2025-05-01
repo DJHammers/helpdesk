@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-@WebServlet("/admin/users/delete")
+@WebServlet("/users/delete")
 public class DeleteUserServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -26,6 +26,6 @@ public class DeleteUserServlet extends HttpServlet {
       throw new ServletException(e);
     }
 
-    response.sendRedirect(request.getContextPath() + "/dashboard?view=users");
+    response.sendRedirect(request.getContextPath() + "/users?view=users");
   }
 }

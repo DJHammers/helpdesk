@@ -27,7 +27,6 @@
             Manage Users
           </a>
         </c:if>
-        <!-- Visible to all authenticated users -->
         <a href="${pageContext.request.contextPath}/tickets"
            class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
                   ${pageContext.request.servletPath=='/tickets'?'bg-gray-100':''}">
@@ -61,10 +60,12 @@
   <main class="flex-1 p-6 overflow-auto">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-2xl font-semibold">Manage Users</h2>
-      <a href="${pageContext.request.contextPath}/users/add"
-         class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
-        Add User
-      </a>
+      <c:if test="${isAdmin}">
+        <a href="${pageContext.request.contextPath}/users/add"
+           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+          Add User
+        </a>
+      </c:if>
     </div>
     <div class="overflow-hidden rounded-lg border bg-white shadow">
       <table class="min-w-full divide-y divide-gray-200">
@@ -85,18 +86,20 @@
               <td class="px-4 py-2 text-sm text-gray-700">${u.email}</td>
               <td class="px-4 py-2 text-sm text-gray-700">${u.role}</td>
               <td class="px-4 py-2 space-x-2 text-sm">
-                <a href="${pageContext.request.contextPath}/users/edit?id=${u.id}"
-                   class="inline-flex px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium">
-                  Edit
-                </a>
-                <form method="post" action="${pageContext.request.contextPath}/users/delete"
-                      class="inline" onsubmit="return confirm('Delete this user?');">
-                  <input type="hidden" name="id" value="${u.id}"/>
-                  <button type="submit"
-                          class="inline-flex px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium">
-                    Delete
-                  </button>
-                </form>
+                <c:if test="${isAdmin}">
+                  <a href="${pageContext.request.contextPath}/users/edit?id=${u.id}"
+                     class="inline-flex px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs font-medium">
+                    Edit
+                  </a>
+                  <form method="post" action="${pageContext.request.contextPath}/users/delete"
+                        class="inline" onsubmit="return confirm('Delete this user?');">
+                    <input type="hidden" name="id" value="${u.id}"/>
+                    <button type="submit"
+                            class="inline-flex px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-xs font-medium">
+                      Delete
+                    </button>
+                  </form>
+                </c:if>
               </td>
             </tr>
           </c:forEach>

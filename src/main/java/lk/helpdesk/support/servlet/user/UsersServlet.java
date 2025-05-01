@@ -16,17 +16,15 @@ public class UsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // --- Auth info ---
+        
         String  role    = (String) req.getAttribute("role");
         boolean isAdmin = "Admin".equals(role);
 
-        // Non-admins get bounced to tickets
         if (!isAdmin) {
             resp.sendRedirect(req.getContextPath() + "/tickets");
             return;
         }
 
-        // --- Load all users for Admins ---
         List<User> users = new ArrayList<>();
         String sql = "SELECT id, username, email, role, created_at FROM users ORDER BY username";
 
@@ -47,7 +45,6 @@ public class UsersServlet extends HttpServlet {
             throw new ServletException("Error loading users", e);
         }
 
-        // --- Forward to JSP ---
         req.setAttribute("usersList", users);
         req.setAttribute("isAdmin",   true);
         req.getRequestDispatcher("/WEB-INF/jsp/users.jsp")

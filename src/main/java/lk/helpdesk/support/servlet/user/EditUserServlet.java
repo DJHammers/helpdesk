@@ -12,7 +12,7 @@ import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 
-@WebServlet("/admin/users/edit")
+@WebServlet("/users/edit")
 public class EditUserServlet extends HttpServlet {
     private static final List<String> ROLES = Arrays.asList(
         "User",
@@ -104,6 +104,6 @@ public class EditUserServlet extends HttpServlet {
             throw new ServletException(e);
         }
 
-        response.sendRedirect(request.getContextPath() + "/dashboard?view=users");
+        response.sendRedirect(request.getContextPath() + "/users?view=users");
     }
 }
