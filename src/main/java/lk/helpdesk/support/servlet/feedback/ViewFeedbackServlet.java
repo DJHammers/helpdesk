@@ -18,6 +18,10 @@ public class ViewFeedbackServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        String role = (String) req.getAttribute("role");
+        boolean isAdmin = "Admin".equals(role);
+        req.setAttribute("isAdmin", isAdmin);
+
         // 1) Determine page number
         int page = 1;
         String pageParam = req.getParameter("page");
@@ -30,8 +34,7 @@ public class ViewFeedbackServlet extends HttpServlet {
         // 2) Total count
         int totalCount = 0;
         try (Connection conn = DBConfig.getConnection();
-             PreparedStatement psCount = conn.prepareStatement(
-                 "SELECT COUNT(*) FROM feedback");
+             PreparedStatement psCount = conn.prepareStatement("SELECT COUNT(*) FROM feedback");
              ResultSet rsCount = psCount.executeQuery()) {
             if (rsCount.next()) {
                 totalCount = rsCount.getInt(1);
@@ -39,17 +42,15 @@ public class ViewFeedbackServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Unable to count feedback", e);
         }
-
         int totalPages = (totalCount + PAGE_SIZE - 1) / PAGE_SIZE;
 
         // 3) Load one page of feedback
         List<Feedback> feedbackList = new ArrayList<>();
-        String sql = ""
-          + "SELECT f.id, f.user_id, u.username, f.message, f.rating, f.created_at "
-          + "FROM feedback f JOIN users u ON f.user_id = u.id "
-          + "ORDER BY f.created_at DESC "
-          + "LIMIT ? OFFSET ?";
-
+        String sql =
+            "SELECT f.id, f.user_id, u.username, f.message, f.rating, f.created_at " +
+            "FROM feedback f JOIN users u ON f.user_id = u.id " +
+            "ORDER BY f.created_at DESC " +
+            "LIMIT ? OFFSET ?";
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -73,8 +74,8 @@ public class ViewFeedbackServlet extends HttpServlet {
 
         // 4) Push into request
         req.setAttribute("feedbackList", feedbackList);
-        req.setAttribute("currentPage",  page);
-        req.setAttribute("totalPages",   totalPages);
+        req.setAttribute("currentPage", page);
+        req.setAttribute("totalPages", totalPages);
 
         req.getRequestDispatcher("/WEB-INF/jsp/view_feedback.jsp")
            .forward(req, resp);

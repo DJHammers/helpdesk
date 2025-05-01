@@ -16,11 +16,9 @@ public class TicketsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         Integer userId = (Integer) req.getAttribute("userId");
         String  role   = (String)  req.getAttribute("role");
         boolean isAdmin = "Admin".equals(role);
-
 
         String statusFilter = req.getParameter("status");
         StringBuilder sql = new StringBuilder(
@@ -44,7 +42,6 @@ public class TicketsServlet extends HttpServlet {
             whereUsed = true;
         }
 
-        
         if (isAdmin && "ASSIGNED_Admin".equals(statusFilter)) {
             sql.append(whereUsed ? " AND " : " WHERE ")
                .append("t.assigned_role = 'Admin'");
@@ -58,15 +55,12 @@ public class TicketsServlet extends HttpServlet {
 
         sql.append(" ORDER BY t.created_at DESC");
 
-        
         List<Ticket> tickets = new ArrayList<>();
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Ticket t = new Ticket();

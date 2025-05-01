@@ -18,6 +18,9 @@ public class CreateTicketServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        String role = (String) req.getAttribute("role");
+        boolean isAdmin = "Admin".equals(role);
+        req.setAttribute("isAdmin", isAdmin);
 
         req.getRequestDispatcher("/WEB-INF/jsp/ticket_form.jsp")
            .forward(req, resp);
@@ -26,7 +29,6 @@ public class CreateTicketServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         Integer userId = (Integer) req.getAttribute("userId");
         if (userId == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
@@ -46,7 +48,6 @@ public class CreateTicketServlet extends HttpServlet {
         if (description.length() > MAX_DESCRIPTION_LENGTH) {
             description = description.substring(0, MAX_DESCRIPTION_LENGTH);
         }
-
 
         String sql = "INSERT INTO tickets(user_id, subject, description) VALUES (?, ?, ?)";
         try (Connection conn = DBConfig.getConnection();

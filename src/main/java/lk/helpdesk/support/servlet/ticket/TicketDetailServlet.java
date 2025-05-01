@@ -8,13 +8,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet("/tickets/view")
 public class TicketDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        String role = (String) req.getAttribute("role");
+        boolean isAdmin = "Admin".equals(role);
+        req.setAttribute("isAdmin", isAdmin);
 
         int ticketId;
         try {
@@ -27,7 +31,7 @@ public class TicketDetailServlet extends HttpServlet {
         String subject, status, assignedRole;
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-               "SELECT subject,status,assigned_role FROM tickets WHERE id=?")) {
+                 "SELECT subject,status,assigned_role FROM tickets WHERE id=?")) {
             ps.setInt(1, ticketId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
@@ -50,12 +54,12 @@ public class TicketDetailServlet extends HttpServlet {
         List<TicketMessage> msgs = new ArrayList<>();
         try (Connection conn = DBConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(
-               "SELECT m.id,m.ticket_id,m.sender_id,u.username,u.role AS sender_role," +
-               "m.message,m.created_at " +
-               "FROM ticket_messages m " +
-               "JOIN users u ON m.sender_id=u.id " +
-               "WHERE m.ticket_id=? " +
-               "ORDER BY m.created_at DESC")) {
+                 "SELECT m.id,m.ticket_id,m.sender_id,u.username,u.role AS sender_role,"
+               + "m.message,m.created_at "
+               + "FROM ticket_messages m "
+               + "JOIN users u ON m.sender_id=u.id "
+               + "WHERE m.ticket_id=? "
+               + "ORDER BY m.created_at DESC")) {
             ps.setInt(1, ticketId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

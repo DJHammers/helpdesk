@@ -1,7 +1,8 @@
 <%@ page session="false" contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List, lk.helpdesk.support.model.Ticket" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +29,6 @@
             Manage Users
           </a>
         </c:if>
-        <!-- Visible to all authenticated users -->
         <a href="${pageContext.request.contextPath}/tickets"
            class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
                   ${pageContext.request.servletPath=='/tickets'?'bg-gray-100':''}">
@@ -105,10 +105,20 @@
               <td class="px-4 py-2 text-sm text-gray-700">${t.id}</td>
               <td class="px-4 py-2 whitespace-nowrap">
                 <div class="flex items-center space-x-2">
-                  <img class="w-8 h-8 rounded-full"
-                       src="${pageContext.request.contextPath}/avatar?userId=${t.userId}"
-                       alt="${t.username}"
-                       onerror="this.src='${pageContext.request.contextPath}/static/img/default-avatar.png';"/>
+                  <div class="relative w-8 h-8">
+                    <img
+                      class="w-8 h-8 rounded-full object-cover"
+                      src="${pageContext.request.contextPath}/avatar?userId=${t.userId}"
+                      alt="${t.username}"
+                      onerror="
+                        this.style.display='none';
+                        this.nextElementSibling.style.display='flex';
+                      "/>
+                    <span
+                      class="absolute inset-0 hidden items-center justify-center rounded-full bg-gray-300 text-white font-bold">
+                      ${fn:toUpperCase(fn:substring(t.username,0,1))}
+                    </span>
+                  </div>
                   <span class="text-sm font-medium">${t.username}</span>
                 </div>
               </td>
@@ -146,6 +156,27 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination -->
+    <c:if test="${totalPages > 1}">
+      <div class="flex justify-center items-center space-x-4 mt-6">
+        <c:if test="${currentPage > 1}">
+          <a href="${pageContext.request.contextPath}/tickets?page=${currentPage - 1}"
+             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+            Previous
+          </a>
+        </c:if>
+
+        <span>Page ${currentPage} of ${totalPages}</span>
+
+        <c:if test="${currentPage < totalPages}">
+          <a href="${pageContext.request.contextPath}/tickets?page=${currentPage + 1}"
+             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+            Next
+          </a>
+        </c:if>
+      </div>
+    </c:if>
   </main>
 </body>
 </html>

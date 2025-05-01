@@ -15,6 +15,11 @@ public class SubmitFeedbackServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        // preserve admin flag for sidebar
+        String role = (String) req.getAttribute("role");
+        boolean isAdmin = "Admin".equals(role);
+        req.setAttribute("isAdmin", isAdmin);
+
         req.getRequestDispatcher("/WEB-INF/jsp/feedback.jsp")
            .forward(req, resp);
     }
@@ -33,7 +38,7 @@ public class SubmitFeedbackServlet extends HttpServlet {
         try {
             rating = Integer.parseInt(req.getParameter("rating"));
             if (rating < 1 || rating > 5) rating = 5;
-        } catch (NumberFormatException ignore) {}
+        } catch (NumberFormatException ignored) {}
 
         String sql = "INSERT INTO feedback (user_id, message, rating) VALUES (?, ?, ?)";
         try (Connection conn = DBConfig.getConnection();

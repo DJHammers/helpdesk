@@ -5,36 +5,41 @@ import lk.helpdesk.support.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.annotation.*;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 
+@MultipartConfig(
+    fileSizeThreshold   = 1024 * 1024,     // 1 MB
+    maxFileSize         = 5 * 1024 * 1024, // 5 MB
+    maxRequestSize      = 6 * 1024 * 1024  // 6 MB
+)
 @WebServlet("/users/add")
 public class AddUserServlet extends HttpServlet {
-    private static final List<String> ROLES = Arrays.asList(
-        "User",
-        "Support",
-        "Admin"
-    );
+    private static final List<String> ROLES = Arrays.asList("User", "Support", "Admin");
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        request.setAttribute("roles", ROLES);
-        request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
-               .forward(request, response);
+        boolean isAdmin = "Admin".equals(req.getAttribute("role"));
+        req.setAttribute("isAdmin", isAdmin);
+
+        req.setAttribute("roles", ROLES);
+        req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
+           .forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String username = request.getParameter("username").trim();
-        String email    = request.getParameter("email").trim();
-        String password = request.getParameter("password");
-        String role     = request.getParameter("role");
+        String username = req.getParameter("username").trim();
+        String email    = req.getParameter("email").trim();
+        String password = req.getParameter("password");
+        String role     = req.getParameter("role");
 
         String checkSql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
         try (Connection conn = DBConfig.getConnection();
@@ -45,34 +50,55 @@ public class AddUserServlet extends HttpServlet {
             try (ResultSet rs = psCheck.executeQuery()) {
                 rs.next();
                 if (rs.getInt(1) > 0) {
-                    request.setAttribute("errorMessage", "Username or email already in use");
-                    request.setAttribute("roles", ROLES);
+                    req.setAttribute("errorMessage", "Username or email already in use");
+                    req.setAttribute("roles", ROLES);
                     User pre = new User();
                     pre.setUsername(username);
                     pre.setEmail(email);
                     pre.setRole(role);
-                    request.setAttribute("user", pre);
-                    request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
-                           .forward(request, response);
+                    req.setAttribute("user", pre);
+
+                    boolean isAdmin = "Admin".equals(req.getAttribute("role"));
+                    req.setAttribute("isAdmin", isAdmin);
+
+                    req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
+                       .forward(req, resp);
                     return;
                 }
             }
 
             String insertSql = "INSERT INTO users(username, email, password_hash, role) VALUES (?,?,?,?)";
-            String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
-
-            try (PreparedStatement psIns = conn.prepareStatement(insertSql)) {
+            try (PreparedStatement psIns = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
                 psIns.setString(1, username);
                 psIns.setString(2, email);
-                psIns.setString(3, hashed);
+                psIns.setString(3, BCrypt.hashpw(password, BCrypt.gensalt()));
                 psIns.setString(4, role);
                 psIns.executeUpdate();
+
+                int newUserId;
+                try (ResultSet gk = psIns.getGeneratedKeys()) {
+                    gk.next();
+                    newUserId = gk.getInt(1);
+                }
+
+                Part avatar = req.getPart("avatarFile");
+                if (avatar != null && avatar.getSize() > 0) {
+                    String avSql = "INSERT INTO user_avatars(user_id, mime_type, original_name, img_blob) VALUES (?,?,?,?)";
+                    try (PreparedStatement psAv = conn.prepareStatement(avSql);
+                         InputStream in = avatar.getInputStream()) {
+                        psAv.setInt(1, newUserId);
+                        psAv.setString(2, avatar.getContentType());
+                        psAv.setString(3, avatar.getSubmittedFileName());
+                        psAv.setBinaryStream(4, in);
+                        psAv.executeUpdate();
+                    }
+                }
             }
 
         } catch (SQLException e) {
-            throw new ServletException(e);
+            throw new ServletException("Error adding user", e);
         }
 
-        response.sendRedirect(request.getContextPath() + "/users?view=users");
+        resp.sendRedirect(req.getContextPath() + "/users");
     }
 }

@@ -10,20 +10,63 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <title>View Feedback</title>
 </head>
-<body class="bg-gray-50 p-6">
-  <div class="max-w-3xl mx-auto space-y-6">
-
-    <!-- Back to Dashboard -->
+<body class="flex h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r flex flex-col justify-between">
     <div>
-      <a href="${pageContext.request.contextPath}/dashboard"
+      <div class="p-6"><h2 class="text-2xl font-bold">Help Desk</h2></div>
+      <nav class="mt-6 space-y-2">
+        <c:if test="${isAdmin}">
+          <a href="${pageContext.request.contextPath}/dashboard"
+             class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
+                    ${pageContext.request.servletPath=='/dashboard'?'bg-gray-100':''}">
+            Dashboard
+          </a>
+          <a href="${pageContext.request.contextPath}/users"
+             class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
+                    ${pageContext.request.servletPath=='/users'?'bg-gray-100':''}">
+            Manage Users
+          </a>
+        </c:if>
+        <a href="${pageContext.request.contextPath}/tickets"
+           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
+                  ${pageContext.request.servletPath=='/tickets'?'bg-gray-100':''}">
+          View Tickets
+        </a>
+        <a href="${pageContext.request.contextPath}/profile"
+           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100">
+          My Profile
+        </a>
+        <a href="${pageContext.request.contextPath}/feedback"
+           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
+                  ${pageContext.request.servletPath=='/feedback'?'bg-gray-100':''}">
+          Feedback
+        </a>
+        <a href="${pageContext.request.contextPath}/viewFeedback"
+           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
+                  ${pageContext.request.servletPath=='/viewFeedback'?'bg-gray-100':''}">
+          View Feedback
+        </a>
+      </nav>
+    </div>
+    <div class="p-6">
+      <a href="${pageContext.request.contextPath}/logout"
+         class="block w-full text-center py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+        Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-auto">
+    <!-- Back to Dashboard -->
+    <a href="${pageContext.request.contextPath}/dashboard"
        class="inline-flex items-center text-sm text-blue-600 hover:underline mb-4">
       ← Back to Dashboard
-        </a>
-    </div>
+    </a>
 
-    <h1 class="text-2xl font-bold">All Feedback</h1>
+    <h1 class="text-2xl font-bold mb-6">All Feedback</h1>
 
-    <!-- Feedback cards -->
     <c:forEach var="fb" items="${feedbackList}">
       <div class="bg-white p-4 rounded-lg shadow">
         <div class="flex justify-between items-center mb-2">
@@ -32,16 +75,11 @@
             <fmt:formatDate value="${fb.createdAt}" pattern="yyyy-MM-dd HH:mm"/>
           </span>
         </div>
-
-        <!-- Star rating -->
         <div class="flex space-x-1 mb-3 text-xl">
           <c:forEach var="i" begin="1" end="5">
-            <span class="${i <= fb.rating ? 'text-yellow-400' : 'text-gray-300'}">
-              &#9733;
-            </span>
+            <span class="${i <= fb.rating ? 'text-yellow-400' : 'text-gray-300'}">&#9733;</span>
           </c:forEach>
         </div>
-
         <p class="whitespace-pre-line text-gray-800">${fb.message}</p>
       </div>
     </c:forEach>
@@ -55,9 +93,7 @@
             Previous
           </a>
         </c:if>
-
         <span>Page ${currentPage} of ${totalPages}</span>
-
         <c:if test="${currentPage < totalPages}">
           <a href="${pageContext.request.contextPath}/viewFeedback?page=${currentPage + 1}"
              class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
@@ -66,7 +102,6 @@
         </c:if>
       </div>
     </c:if>
-
-  </div>
+  </main>
 </body>
 </html>

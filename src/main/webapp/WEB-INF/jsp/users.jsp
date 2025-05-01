@@ -1,6 +1,7 @@
 <%@ page session="false" contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List, lk.helpdesk.support.model.User" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +16,7 @@
     <div>
       <div class="p-6"><h2 class="text-2xl font-bold">Help Desk</h2></div>
       <nav class="mt-6 space-y-2">
+        <!-- Admin-only links -->
         <c:if test="${isAdmin}">
           <a href="${pageContext.request.contextPath}/dashboard"
              class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
@@ -27,6 +29,8 @@
             Manage Users
           </a>
         </c:if>
+
+        <!-- Visible to all authenticated users -->
         <a href="${pageContext.request.contextPath}/tickets"
            class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
                   ${pageContext.request.servletPath=='/tickets'?'bg-gray-100':''}">
@@ -82,7 +86,25 @@
           <c:forEach var="u" items="${usersList}">
             <tr class="hover:bg-gray-50">
               <td class="px-4 py-2 text-sm text-gray-700">${u.id}</td>
-              <td class="px-4 py-2 text-sm text-gray-700">${u.username}</td>
+              <td class="px-4 py-2 text-sm text-gray-700">
+                <div class="flex items-center space-x-2">
+                  <div class="relative w-8 h-8 flex-shrink-0">
+                    <img
+                      src="${pageContext.request.contextPath}/avatar?userId=${u.id}"
+                      alt="${u.username}"
+                      class="w-8 h-8 rounded-full object-cover"
+                      onerror="
+                        this.style.display='none';
+                        this.nextElementSibling.style.display='flex';
+                      "/>
+                    <span
+                      class="absolute inset-0 hidden items-center justify-center rounded-full bg-gray-300 text-white font-bold">
+                      ${fn:toUpperCase(fn:substring(u.username,0,1))}
+                    </span>
+                  </div>
+                  <span>${u.username}</span>
+                </div>
+              </td>
               <td class="px-4 py-2 text-sm text-gray-700">${u.email}</td>
               <td class="px-4 py-2 text-sm text-gray-700">${u.role}</td>
               <td class="px-4 py-2 space-x-2 text-sm">
@@ -111,6 +133,27 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Pagination -->
+    <c:if test="${totalPages > 1}">
+      <div class="flex justify-center items-center space-x-4 mt-6">
+        <c:if test="${currentPage > 1}">
+          <a href="${pageContext.request.contextPath}/users?page=${currentPage - 1}"
+             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+            Previous
+          </a>
+        </c:if>
+
+        <span>Page ${currentPage} of ${totalPages}</span>
+
+        <c:if test="${currentPage < totalPages}">
+          <a href="${pageContext.request.contextPath}/users?page=${currentPage + 1}"
+             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+            Next
+          </a>
+        </c:if>
+      </div>
+    </c:if>
   </main>
 </body>
 </html>
