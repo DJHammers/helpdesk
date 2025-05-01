@@ -1,4 +1,4 @@
-package lk.helpdesk.support.servlet;
+package lk.helpdesk.support.servlet.ticket;
 
 import lk.helpdesk.support.config.DBConfig;
 

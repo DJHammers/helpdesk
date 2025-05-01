@@ -1,4 +1,4 @@
-package lk.helpdesk.support.servlet;
+package lk.helpdesk.support.servlet.signin;
 
 import lk.helpdesk.support.config.DBConfig;
 import lk.helpdesk.support.util.JwtUtil;

@@ -1,4 +1,4 @@
-package lk.helpdesk.support.servlet;
+package lk.helpdesk.support.servlet.profile;
 
 import lk.helpdesk.support.config.DBConfig;
 import org.mindrot.jbcrypt.BCrypt;
