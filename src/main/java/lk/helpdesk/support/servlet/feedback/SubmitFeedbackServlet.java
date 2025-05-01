@@ -1,24 +1,21 @@
 package lk.helpdesk.support.servlet.feedback;
 
-import lk.helpdesk.support.config.DBConfig;
+import lk.helpdesk.support.dao.FeedbackDAO;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 @WebServlet("/feedback")
 public class SubmitFeedbackServlet extends HttpServlet {
+    private final FeedbackDAO dao = new FeedbackDAO();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        String role = (String) req.getAttribute("role");
-        boolean isAdmin = "Admin".equals(role);
-        req.setAttribute("isAdmin", isAdmin);
+        String role = (String)req.getAttribute("role");
+        req.setAttribute("isAdmin", "Admin".equals(role));
 
         req.getRequestDispatcher("/WEB-INF/jsp/feedback.jsp")
            .forward(req, resp);
@@ -27,27 +24,23 @@ public class SubmitFeedbackServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Integer userId = (Integer) req.getAttribute("userId");
+        Integer userId = (Integer)req.getAttribute("userId");
         if (userId == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
         String message = req.getParameter("message");
-        int rating = 5;
+        int rating;
         try {
             rating = Integer.parseInt(req.getParameter("rating"));
-            if (rating < 1 || rating > 5) rating = 5;
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException e) {
+            rating = 5;
+        }
 
-        String sql = "INSERT INTO feedback (user_id, message, rating) VALUES (?, ?, ?)";
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setString(2, message);
-            ps.setInt(3, rating);
-            ps.executeUpdate();
-        } catch (SQLException e) {
+        try {
+            dao.create(userId, message, rating);
+        } catch (Exception e) {
             throw new ServletException("Unable to save feedback", e);
         }
 

@@ -1,6 +1,6 @@
 package lk.helpdesk.support.servlet.user;
 
-import lk.helpdesk.support.config.DBConfig;
+import lk.helpdesk.support.dao.UserDAO;
 import lk.helpdesk.support.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -8,26 +8,25 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.*;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-@MultipartConfig(
-    fileSizeThreshold   = 1024 * 1024,     // 1 MB
-    maxFileSize         = 5 * 1024 * 1024, // 5 MB
-    maxRequestSize      = 6 * 1024 * 1024  // 6 MB
-)
 @WebServlet("/users/add")
+@MultipartConfig(
+    fileSizeThreshold   = 1024 * 1024,
+    maxFileSize         = 5 * 1024 * 1024,
+    maxRequestSize      = 6 * 1024 * 1024
+)
 public class AddUserServlet extends HttpServlet {
     private static final List<String> ROLES = Arrays.asList("User", "Support", "Admin");
+    private final UserDAO dao = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         boolean isAdmin = "Admin".equals(req.getAttribute("role"));
         req.setAttribute("isAdmin", isAdmin);
-
         req.setAttribute("roles", ROLES);
         req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
            .forward(req, resp);
@@ -41,64 +40,50 @@ public class AddUserServlet extends HttpServlet {
         String password = req.getParameter("password");
         String role     = req.getParameter("role");
 
-        String checkSql = "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?";
-        try (Connection conn = DBConfig.getConnection();
-             PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+        boolean isAdmin = "Admin".equals(req.getAttribute("role"));
+        req.setAttribute("isAdmin", isAdmin);
+        req.setAttribute("roles", ROLES);
 
-            psCheck.setString(1, username);
-            psCheck.setString(2, email);
-            try (ResultSet rs = psCheck.executeQuery()) {
-                rs.next();
-                if (rs.getInt(1) > 0) {
-                    req.setAttribute("errorMessage", "Username or email already in use");
-                    req.setAttribute("roles", ROLES);
-                    User pre = new User();
-                    pre.setUsername(username);
-                    pre.setEmail(email);
-                    pre.setRole(role);
-                    req.setAttribute("user", pre);
+        if (username.isBlank() || email.isBlank() || password == null || password.isBlank() ||
+            role == null || !ROLES.contains(role)) {
+            req.setAttribute("errorMessage", "All fields except profile picture are required and must be valid.");
+            User pre = new User();
+            pre.setUsername(username);
+            pre.setEmail(email);
+            pre.setRole(role);
+            req.setAttribute("user", pre);
+            req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(req, resp);
+            return;
+        }
 
-                    boolean isAdmin = "Admin".equals(req.getAttribute("role"));
-                    req.setAttribute("isAdmin", isAdmin);
-
-                    req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
-                       .forward(req, resp);
-                    return;
-                }
+        try {
+            if (dao.existsByUsernameOrEmail(username, email)) {
+                req.setAttribute("errorMessage", "Username or email already in use");
+                User pre = new User();
+                pre.setUsername(username);
+                pre.setEmail(email);
+                pre.setRole(role);
+                req.setAttribute("user", pre);
+                req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(req, resp);
+                return;
             }
 
-            String insertSql = "INSERT INTO users(username, email, password_hash, role) VALUES (?,?,?,?)";
-            try (PreparedStatement psIns = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
-                psIns.setString(1, username);
-                psIns.setString(2, email);
-                psIns.setString(3, BCrypt.hashpw(password, BCrypt.gensalt()));
-                psIns.setString(4, role);
-                psIns.executeUpdate();
+            String hash = BCrypt.hashpw(password, BCrypt.gensalt());
+            int newUserId = dao.createUser(username, email, hash, role);
 
-                int newUserId;
-                try (ResultSet gk = psIns.getGeneratedKeys()) {
-                    gk.next();
-                    newUserId = gk.getInt(1);
-                }
-
-                Part avatar = req.getPart("avatarFile");
-                if (avatar != null && avatar.getSize() > 0) {
-                    String avSql = "INSERT INTO user_avatars(user_id, mime_type, original_name, img_blob) VALUES (?,?,?,?)";
-                    try (PreparedStatement psAv = conn.prepareStatement(avSql);
-                         InputStream in = avatar.getInputStream()) {
-                        psAv.setInt(1, newUserId);
-                        psAv.setString(2, avatar.getContentType());
-                        psAv.setString(3, avatar.getSubmittedFileName());
-                        psAv.setBinaryStream(4, in);
-                        psAv.executeUpdate();
-                    }
-                }
+            Part avatar = req.getPart("avatarFile");
+            if (avatar != null && avatar.getSize() > 0) {
+                dao.saveAvatar(
+                  newUserId,
+                  avatar.getContentType(),
+                  avatar.getSubmittedFileName(),
+                  avatar.getInputStream()
+                );
             }
 
+            resp.sendRedirect(req.getContextPath() + "/users");
         } catch (SQLException e) {
             throw new ServletException("Error adding user", e);
         }
-
-        resp.sendRedirect(req.getContextPath() + "/users");
     }
 }

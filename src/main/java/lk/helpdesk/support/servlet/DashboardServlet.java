@@ -40,9 +40,8 @@ public class DashboardServlet extends HttpServlet {
             throw new ServletException("Unable to load dashboard data", e);
         }
 
-
         req.setAttribute("statusCounts", statusCounts);
-        req.setAttribute("isAdmin",      true);
+        req.setAttribute("isAdmin", true);
         req.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp")
            .forward(req, resp);
     }

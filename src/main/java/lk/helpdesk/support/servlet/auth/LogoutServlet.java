@@ -1,4 +1,4 @@
-package lk.helpdesk.support.servlet.signin;
+package lk.helpdesk.support.servlet.auth;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;

@@ -64,22 +64,23 @@
 
     <div class="max-w-xl bg-white p-6 rounded-lg shadow mx-auto">
       <h2 class="text-2xl font-semibold mb-4">Submit Feedback</h2>
-      <form action="${pageContext.request.contextPath}/feedback" method="post">
+      <form action="${pageContext.request.contextPath}/feedback" method="post" class="space-y-6">
         <textarea name="message" required maxlength="1000"
-                  class="w-full h-32 border rounded p-2 mb-4"
+                  class="w-full h-32 border rounded p-2"
                   placeholder="Your feedback..."></textarea>
 
+        <!-- Star Rating -->
         <div id="star-rating" class="flex space-x-1 mb-6">
           <c:forEach var="i" begin="1" end="5">
-            <label>
-              <input type="radio" name="rating" value="${i}" class="hidden"
-                     ${i == 5 ? 'checked' : ''}/>
+            <label class="cursor-pointer">
+              <input type="radio" name="rating" value="${i}" class="hidden" ${i == 5 ? "checked" : ""}/>
               <svg data-value="${i}"
-                   class="star h-8 w-8 text-gray-300 cursor-pointer"
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927 …"/>
-              </svg>
+                class="star h-8 w-8 text-gray-300 cursor-pointer"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20">
+                <path d="M9.049 2.927C9.259 2.194 10.741 2.194 10.951 2.927l1.286 3.97a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.388 2.462a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.388-2.462a1 1 0 00-1.175 0l-3.388 2.462c-.784.57-1.838-.197-1.539-1.118l1.286-3.97a1 1 0 00-.364-1.118L2.045 9.397c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.951-.69l1.285-3.97z"/>
+            </svg>
             </label>
           </c:forEach>
         </div>
@@ -93,23 +94,28 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const stars  = document.querySelectorAll('.star');
-      const inputs = document.querySelectorAll('input[name="rating"]');
+    document.addEventListener("DOMContentLoaded", function() {
+      const stars  = document.querySelectorAll(".star");
+      const inputs = document.querySelectorAll("input[name='rating']");
+
       function updateStars(rating) {
         stars.forEach(star => {
-          const val = parseInt(star.getAttribute('data-value'), 10);
-          star.classList.toggle('text-yellow-400', val <= rating);
-          star.classList.toggle('text-gray-300', val > rating);
+          const val = parseInt(star.getAttribute("data-value"), 10);
+          star.classList.toggle("text-yellow-400", val <= rating);
+          star.classList.toggle("text-gray-300", val > rating);
         });
       }
+
       inputs.forEach(input =>
-        input.addEventListener('change', e =>
+        input.addEventListener("change", e =>
           updateStars(parseInt(e.target.value, 10))
         )
       );
-      const checked = document.querySelector('input[name="rating"]:checked');
-      if (checked) updateStars(parseInt(checked.value, 10));
+
+      const checked = document.querySelector("input[name='rating']:checked");
+      if (checked) {
+        updateStars(parseInt(checked.value, 10));
+      }
     });
   </script>
 </body>
