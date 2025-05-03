@@ -19,8 +19,12 @@ public class TicketsServlet extends HttpServlet {
 
         Integer userId = (Integer) req.getAttribute("userId");
         String  role   = (String)  req.getAttribute("role");
-        boolean isAdmin = "Admin".equals(role);
-        req.setAttribute("isAdmin", isAdmin);
+        boolean isAdmin   = "Admin".equals(role);
+        boolean isSupport = "Support".equals(role);
+
+        req.setAttribute("isAdmin",   isAdmin);
+        req.setAttribute("isSupport", isSupport);
+        req.setAttribute("role",      role);
 
         String statusFilter = req.getParameter("status");
         int page = 1;
@@ -35,9 +39,8 @@ public class TicketsServlet extends HttpServlet {
             int totalPages = (total + TicketDAO.PAGE_SIZE - 1) / TicketDAO.PAGE_SIZE;
             List<Ticket> tickets = dao.findPage(userId, role, statusFilter, page);
 
-            req.setAttribute("ticketsList",  tickets);
+            req.setAttribute("ticketsList", tickets);
             req.setAttribute("statusFilter", statusFilter == null ? "" : statusFilter);
-            req.setAttribute("isAdmin",      isAdmin);
             req.setAttribute("currentPage",  page);
             req.setAttribute("totalPages",   totalPages);
 

@@ -2,6 +2,7 @@ package lk.helpdesk.support.dao;
 
 import lk.helpdesk.support.config.DBConfig;
 import lk.helpdesk.support.model.Ticket;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +15,12 @@ public class TicketDAO {
         List<Object> params = new ArrayList<>();
         boolean where = false;
 
-        if (!"Admin".equals(role)) {
+        if (!"Admin".equals(role) && !"Support".equals(role)) {
             sql.append(" WHERE t.user_id = ?");
             params.add(userId);
             where = true;
         }
+
         if (statusFilter != null && !statusFilter.isEmpty()) {
             sql.append(where ? " AND " : " WHERE ");
             if (statusFilter.startsWith("ASSIGNED_")) {
@@ -50,11 +52,12 @@ public class TicketDAO {
         List<Object> params = new ArrayList<>();
         boolean where = false;
 
-        if (!"Admin".equals(role)) {
+        if (!"Admin".equals(role) && !"Support".equals(role)) {
             sql.append(" WHERE t.user_id = ?");
             params.add(userId);
             where = true;
         }
+
         if (statusFilter != null && !statusFilter.isEmpty()) {
             sql.append(where ? " AND " : " WHERE ");
             if (statusFilter.startsWith("ASSIGNED_")) {

@@ -58,7 +58,6 @@
     </div>
   </aside>
 
-  <!-- Tickets List -->
   <main class="flex-1 p-6 overflow-auto">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-2xl font-semibold">Tickets</h2>
@@ -74,13 +73,25 @@
       <select id="status" name="status" onchange="this.form.submit()"
               class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <option value="" ${empty statusFilter ? 'selected' : ''}>All</option>
-        <option value="Open"         ${statusFilter=='Open'         ? 'selected' : ''}>Open</option>
-        <option value="In_Progress"  ${statusFilter=='In_Progress'  ? 'selected' : ''}>In Progress</option>
-        <option value="Resolved"     ${statusFilter=='Resolved'     ? 'selected' : ''}>Resolved</option>
-        <option value="Closed"       ${statusFilter=='Closed'       ? 'selected' : ''}>Closed</option>
+        <option value="Open"         ${statusFilter=='Open'        ? 'selected' : ''}>Open</option>
+        <option value="In_Progress"  ${statusFilter=='In_Progress' ? 'selected' : ''}>In Progress</option>
+        <option value="Resolved"     ${statusFilter=='Resolved'    ? 'selected' : ''}>Resolved</option>
+        <option value="Closed"       ${statusFilter=='Closed'      ? 'selected' : ''}>Closed</option>
+
+        <!-- Admin sees “Assigned to Admin” -->
         <c:if test="${isAdmin}">
-          <option value="ASSIGNED_Admin"   ${statusFilter=='ASSIGNED_Admin'   ? 'selected' : ''}>Assigned to Admin</option>
-          <option value="ASSIGNED_Support" ${statusFilter=='ASSIGNED_Support' ? 'selected' : ''}>Assigned to Support</option>
+          <option value="ASSIGNED_Admin"
+                  ${statusFilter=='ASSIGNED_Admin'   ? 'selected' : ''}>
+            Assigned to Admin
+          </option>
+        </c:if>
+
+        <!-- Admin & Support see “Assigned to Support” -->
+        <c:if test="${isAdmin || isSupport}">
+          <option value="ASSIGNED_Support"
+                  ${statusFilter=='ASSIGNED_Support' ? 'selected' : ''}>
+            Assigned to Support
+          </option>
         </c:if>
       </select>
     </form>
@@ -101,7 +112,8 @@
         <tbody class="bg-white divide-y divide-gray-200">
           <c:forEach var="t" items="${ticketsList}">
             <tr class="hover:bg-gray-50 cursor-pointer"
-                onclick="if (!event.target.closest('form')) window.location='${pageContext.request.contextPath}/tickets/view?id=${t.id}';">
+                onclick="if (!event.target.closest('form')) 
+                         window.location='${pageContext.request.contextPath}/tickets/view?id=${t.id}';">
               <td class="px-4 py-2 text-sm text-gray-700">${t.id}</td>
               <td class="px-4 py-2 whitespace-nowrap">
                 <div class="flex items-center space-x-2">
@@ -126,15 +138,22 @@
               <td class="px-4 py-2 text-sm text-gray-700">${t.status}</td>
               <td class="px-4 py-2 text-sm text-gray-700">${t.assignedRole}</td>
               <td class="px-4 py-2 text-sm text-gray-700">
-                <c:if test="${isAdmin}">
+                <!-- show assign form to Admin OR Support -->
+                <c:if test="${isAdmin || isSupport}">
                   <form action="${pageContext.request.contextPath}/tickets/assign" method="post"
                         class="flex items-center space-x-2" onclick="event.stopPropagation()">
                     <input type="hidden" name="ticketId" value="${t.id}"/>
+
                     <select name="role"
-                            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <option value="Support" ${t.assignedRole=='Support'?'selected':''}>Support</option>
-                      <option value="Admin"   ${t.assignedRole=='Admin'  ?'selected':''}>Admin</option>
+                            class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2
+                                   ${isAdmin ? 'focus:ring-green-500' : 'focus:ring-indigo-500'}">
+                      <!-- Admin and Support can choose either -->
+                      <c:if test="${isAdmin || isSupport}">
+                        <option value="Support" ${t.assignedRole=='Support'?'selected':''}>Support</option>
+                        <option value="Admin"   ${t.assignedRole=='Admin'  ?'selected':''}>Admin</option>
+                      </c:if>
                     </select>
+
                     <button type="submit"
                             class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
                       Assign
@@ -162,18 +181,12 @@
       <div class="flex justify-center items-center space-x-4 mt-6">
         <c:if test="${currentPage > 1}">
           <a href="${pageContext.request.contextPath}/tickets?page=${currentPage - 1}"
-             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
-            Previous
-          </a>
+             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Previous</a>
         </c:if>
-
         <span>Page ${currentPage} of ${totalPages}</span>
-
         <c:if test="${currentPage < totalPages}">
           <a href="${pageContext.request.contextPath}/tickets?page=${currentPage + 1}"
-             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
-            Next
-          </a>
+             class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Next</a>
         </c:if>
       </div>
     </c:if>
