@@ -9,12 +9,14 @@ import java.io.IOException;
 
 @WebServlet("/feedback")
 public class SubmitFeedbackServlet extends HttpServlet {
+
     private final FeedbackDAO dao = new FeedbackDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        String role = (String)req.getAttribute("role");
+
+        String role = (String) req.getAttribute("role");
         req.setAttribute("isAdmin", "Admin".equals(role));
 
         req.getRequestDispatcher("/WEB-INF/jsp/feedback.jsp")
@@ -24,16 +26,25 @@ public class SubmitFeedbackServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        Integer userId = (Integer)req.getAttribute("userId");
+
+        Integer userId = (Integer) req.getAttribute("userId");
         if (userId == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
         String message = req.getParameter("message");
+        if (message == null) message = "";
+        if (message.length() > 500) {
+            req.setAttribute("error", "Feedback must be 500 characters or less.");
+            doGet(req, resp);
+            return;
+        }
+
         int rating;
         try {
             rating = Integer.parseInt(req.getParameter("rating"));
+            if (rating < 1 || rating > 5) rating = 5;
         } catch (NumberFormatException e) {
             rating = 5;
         }
