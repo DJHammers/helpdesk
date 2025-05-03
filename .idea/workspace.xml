@@ -9,10 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef2ca512-e9ca-45c0-8b4f-bff85f158716" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/lk/helpdesk/support/servlet/DashboardServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/lk/helpdesk/support/servlet/DashboardServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/jsp/dashboard.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/jsp/dashboard.jsp" afterDir="false" />
-    </list>
+    <list default="true" id="ef2ca512-e9ca-45c0-8b4f-bff85f158716" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -185,7 +182,7 @@
       <workItem from="1746214319510" duration="6693000" />
       <workItem from="1746240756795" duration="755000" />
       <workItem from="1746280887577" duration="392000" />
-      <workItem from="1746281342595" duration="355000" />
+      <workItem from="1746281342595" duration="670000" />
     </task>
     <servers />
   </component>
