@@ -107,7 +107,6 @@
       
       <!-- Grid of boxes -->
       <dl class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <!-- Name -->
         <div class="border border-[#1b87e7] rounded-lg p-4">
           <dt class="text-xs font-medium text-gray-500 uppercase">Name</dt>
           <dd class="mt-1 text-sm text-gray-900 break-words">${contact.name}</dd>
