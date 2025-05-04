@@ -4,83 +4,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Submit Feedback</title>
+  <title>Submit Feedback – Help Desk Support System</title>
 </head>
-<body class="flex h-screen bg-gray-50">
+<body class="flex h-screen bg-white">
   <!-- Sidebar -->
-  <aside class="w-64 bg-white border-r flex flex-col justify-between">
+  <aside class="w-64 bg-[#1b87e7] flex flex-col justify-between">
     <div>
-      <div class="p-6"><h2 class="text-2xl font-bold">Help Desk</h2></div>
-      <nav class="mt-6 space-y-2">
+      <div class="p-6 flex items-center">
+        <img
+          src="${pageContext.request.contextPath}/images/helpdesk.png"
+          alt="Help Desk Logo"
+          class="h-10 w-10 mr-3"
+        />
+        <h2 class="text-2xl font-bold text-white">Help Desk</h2>
+      </div>
+      <nav class="mt-6 space-y-2 px-2">
         <c:if test="${isAdmin}">
           <a href="${pageContext.request.contextPath}/dashboard"
-             class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
-                    ${pageContext.request.servletPath=='/dashboard'?'bg-gray-100':''}">
+             class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                    hover:bg-[#156ab0] transition
+                    ${pageContext.request.servletPath=='/dashboard' ? 'bg-[#156ab0]' : ''}">
             Dashboard
           </a>
           <a href="${pageContext.request.contextPath}/users"
-             class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
-                    ${pageContext.request.servletPath=='/users'?'bg-gray-100':''}">
+             class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                    hover:bg-[#156ab0] transition
+                    ${pageContext.request.servletPath=='/users' ? 'bg-[#156ab0]' : ''}">
             Manage Users
+          </a>
+          <a href="${pageContext.request.contextPath}/viewContact"
+             class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                    hover:bg-[#156ab0] transition
+                    ${pageContext.request.servletPath=='/viewContact' ? 'bg-[#156ab0]' : ''}">
+            View Contacts
           </a>
         </c:if>
         <a href="${pageContext.request.contextPath}/tickets"
-           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
-                  ${pageContext.request.servletPath=='/tickets'?'bg-gray-100':''}">
+           class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                  hover:bg-[#156ab0] transition
+                  ${pageContext.request.servletPath=='/tickets' ? 'bg-[#156ab0]' : ''}">
           View Tickets
         </a>
         <a href="${pageContext.request.contextPath}/profile"
-           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100">
+           class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                  hover:bg-[#156ab0] transition">
           My Profile
         </a>
         <a href="${pageContext.request.contextPath}/feedback"
-           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
-                  ${pageContext.request.servletPath=='/feedback'?'bg-gray-100':''}">
+           class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                  hover:bg-[#156ab0] transition
+                  ${pageContext.request.servletPath=='/feedback' ? 'bg-[#156ab0]' : ''}">
           Feedback
         </a>
         <a href="${pageContext.request.contextPath}/viewFeedback"
-           class="block w-full px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-100
-                  ${pageContext.request.servletPath=='/viewFeedback'?'bg-gray-100':''}">
+           class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                  hover:bg-[#156ab0] transition
+                  ${pageContext.request.servletPath=='/viewFeedback' ? 'bg-[#156ab0]' : ''}">
           View Feedback
+        </a>
+        <a href="${pageContext.request.contextPath}/contact"
+           class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                  hover:bg-[#156ab0] transition
+                  ${pageContext.request.servletPath=='/contact' ? 'bg-[#156ab0]' : ''}">
+          Contact Us
+        </a>
+        <a href="${pageContext.request.contextPath}/aboutus"
+           class="block w-full px-4 py-2 text-sm font-medium rounded-lg text-white
+                  hover:bg-[#156ab0] transition
+                  ${pageContext.request.servletPath=='/aboutus' ? 'bg-[#156ab0]' : ''}">
+          About Us
         </a>
       </nav>
     </div>
     <div class="p-6">
       <a href="${pageContext.request.contextPath}/logout"
-         class="block w-full text-center py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+         class="block w-full text-center py-3 rounded-lg bg-white text-[#1b87e7] font-medium
+                hover:bg-gray-100 transition">
         Sign Out
       </a>
     </div>
   </aside>
 
   <!-- Main Content -->
-  <main class="flex-1 p-6 overflow-auto">
+  <main class="flex-1 p-6 overflow-auto bg-white">
     <a href="${pageContext.request.contextPath}/dashboard"
-       class="inline-flex items-center text-sm text-blue-600 hover:underline mb-4">
+       class="inline-flex items-center text-sm text-[#1b87e7] hover:underline mb-4">
       ← Back to Dashboard
     </a>
 
-    <div class="max-w-xl bg-white p-6 rounded-lg shadow mx-auto">
-      <h2 class="text-2xl font-semibold mb-4">Submit Feedback</h2>
+    <div class="max-w-xl mx-auto bg-white border border-[#1b87e7] rounded-lg ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-6 space-y-6">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Submit Feedback</h2>
 
-      <!-- Optional server-side error -->
       <c:if test="${not empty error}">
-        <p class="mb-4 text-sm text-red-600">${error}</p>
+        <p class="text-sm text-red-600 mb-4">${error}</p>
       </c:if>
 
       <form action="${pageContext.request.contextPath}/feedback" method="post" class="space-y-6">
         <!-- Feedback message (500-character limit) -->
-        <textarea id="message"
-                  name="message"
-                  required
-                  maxlength="500"
-                  class="w-full h-32 border rounded p-2"
-                  placeholder="Your feedback (max 500 characters)…"
-                  oninput="updateCounter()"></textarea>
-
-        <!-- live character counter -->
+        <textarea
+          id="message"
+          name="message"
+          required
+          maxlength="500"
+          placeholder="Your feedback (max 500 characters)…"
+          oninput="updateCounter()"
+          class="w-full h-32 border border-gray-200 rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#1b87e7]"
+        ></textarea>
         <div class="text-xs text-gray-500">
           <span id="char-count">0</span>/500
         </div>
@@ -89,7 +121,7 @@
         <div id="star-rating" class="flex space-x-1 mb-6">
           <c:forEach var="i" begin="1" end="5">
             <label class="cursor-pointer">
-              <input type="radio" name="rating" value="${i}" class="hidden" ${i == 5 ? "checked" : ""}/>
+              <input type="radio" name="rating" value="${i}" class="hidden" ${i==5?"checked":""}/>
               <svg data-value="${i}"
                    class="star h-8 w-8 text-gray-300 cursor-pointer"
                    xmlns="http://www.w3.org/2000/svg"
@@ -101,8 +133,10 @@
           </c:forEach>
         </div>
 
-        <button type="submit"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          class="w-full px-4 py-2 bg-[#1b87e7] text-white rounded-lg hover:bg-[#1b87e7]/80 transition"
+        >
           Submit Feedback
         </button>
       </form>
@@ -111,29 +145,23 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-
-      const stars  = document.querySelectorAll(".star");
+        
+      const stars = document.querySelectorAll(".star");
       const inputs = document.querySelectorAll("input[name='rating']");
-
-      function paintStars(rating) {
-        stars.forEach(star => {
-          const val = parseInt(star.getAttribute("data-value"), 10);
-          star.classList.toggle("text-yellow-400", val <= rating);
-          star.classList.toggle("text-gray-300",  val >  rating);
+      function paintStars(r) {
+        stars.forEach(s => {
+          const v = +s.dataset.value;
+          s.classList.toggle("text-yellow-400", v <= r);
+          s.classList.toggle("text-gray-300",  v >  r);
         });
       }
-      inputs.forEach(inp =>
-        inp.addEventListener("change", e => paintStars(parseInt(e.target.value, 10)))
-      );
-      const checked = document.querySelector("input[name='rating']:checked");
-      if (checked) paintStars(parseInt(checked.value, 10));
+      inputs.forEach(i => i.addEventListener("change", e => paintStars(+e.target.value)));
+      const sel = document.querySelector("input[name='rating']:checked");
+      if (sel) paintStars(+sel.value);
 
       const msg     = document.getElementById("message");
       const counter = document.getElementById("char-count");
-
-      window.updateCounter = () => {
-        counter.textContent = msg.value.length;
-      };
+      window.updateCounter = () => counter.textContent = msg.value.length;
       updateCounter();
     });
   </script>

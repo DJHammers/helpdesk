@@ -1,24 +1,16 @@
 <%@ page session="false" contentType="text/html; charset=UTF-8" %>
+<%@ page import="lk.helpdesk.support.model.Contact" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Create Ticket – Help Desk Support System</title>
-  <script>
-    function updateCounts() {
-      const subjectEl = document.getElementById('subject');
-      const descEl    = document.getElementById('description');
-      document.getElementById('subCount').textContent  = subjectEl.value.length + '/100';
-      document.getElementById('descCount').textContent = descEl.value.length     + '/1000';
-    }
-    document.addEventListener('DOMContentLoaded', updateCounts);
-  </script>
+  <title>Contact Message Detail – Help Desk Support System</title>
 </head>
-
 <body class="flex h-screen bg-white">
   <!-- Sidebar -->
   <aside class="w-64 bg-[#1b87e7] flex flex-col justify-between">
@@ -98,48 +90,57 @@
     </div>
   </aside>
 
-  <!-- Create Ticket Form -->
-  <main class="flex-1 flex items-center justify-center p-8 overflow-auto">
-    <div class="w-full max-w-lg bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
-      <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Create Ticket</h2>
+  <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-auto bg-white">
+    <a href="${pageContext.request.contextPath}/viewContact"
+       class="inline-flex items-center text-sm text-[#1b87e7] hover:underline mb-4">
+      ← Back to All Messages
+    </a>
 
-      <form action="${pageContext.request.contextPath}/tickets/create"
-            method="post"
-            class="space-y-6"
-            oninput="updateCounts()">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-2xl font-semibold text-gray-800">Contact Message Detail</h2>
+    </div>
 
-        <!-- Subject (max 100) -->
-        <div>
-          <label for="subject" class="block text-sm font-medium text-gray-700">
-            Subject (<span id="subCount">0/100</span>)
-          </label>
-          <input id="subject"
-                 name="subject"
-                 type="text"
-                 required
-                 maxlength="100"
-                 class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1b87e7] break-words"/>
+    <!-- Outer container -->
+    <div class="bg-white border border-[#1b87e7] rounded-lg ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-6 max-w-4xl mx-auto">
+      <h1 class="text-2xl font-semibold mb-6 text-gray-800">Contact Message Detail</h1>
+      
+      <!-- Grid of boxes -->
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- Name -->
+        <div class="border border-[#1b87e7] rounded-lg p-4">
+          <dt class="text-xs font-medium text-gray-500 uppercase">Name</dt>
+          <dd class="mt-1 text-sm text-gray-900 break-words">${contact.name}</dd>
         </div>
-
-        <!-- Description (max 1000) -->
-        <div>
-          <label for="description" class="block text-sm font-medium text-gray-700">
-            Description (<span id="descCount">0/1000</span>)
-          </label>
-          <textarea id="description"
-                    name="description"
-                    rows="5"
-                    required
-                    maxlength="1000"
-                    class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1b87e7] whitespace-pre-line break-words"
-                    placeholder="Describe your issue…"></textarea>
+        
+        <!-- Email -->
+        <div class="border border-[#1b87e7] rounded-lg p-4">
+          <dt class="text-xs font-medium text-gray-500 uppercase">Email</dt>
+          <dd class="mt-1 text-sm text-gray-900 break-words">${contact.email}</dd>
         </div>
-
-        <button type="submit"
-                class="w-full rounded-lg bg-[#1b87e7] py-2 font-semibold text-white shadow-sm hover:bg-[#1b87e7]/80 focus:outline-none focus:ring-2 focus:ring-[#1b87e7]">
-          Submit Ticket
-        </button>
-      </form>
+        
+        <!-- Subject (full width) -->
+        <div class="sm:col-span-2 border border-[#1b87e7] rounded-lg p-4">
+          <dt class="text-xs font-medium text-gray-500 uppercase">Subject</dt>
+          <dd class="mt-1 text-sm text-gray-900 break-words">${contact.subject}</dd>
+        </div>
+        
+        <!-- Date -->
+        <div class="border border-[#1b87e7] rounded-lg p-4">
+          <dt class="text-xs font-medium text-gray-500 uppercase">Date</dt>
+          <dd class="mt-1 text-sm text-gray-800">
+            <fmt:formatDate value="${contact.createdAt}" pattern="yyyy-MM-dd HH:mm"/>
+          </dd>
+        </div>
+        
+        <!-- Message (full width) -->
+        <div class="sm:col-span-2 border border-[#1b87e7] rounded-lg p-4">
+          <dt class="text-xs font-medium text-gray-500 uppercase">Message</dt>
+          <dd class="mt-1 text-sm text-gray-900 whitespace-pre-wrap break-words">
+            <c:out value="${contact.message}"/>
+          </dd>
+        </div>
+      </dl>
     </div>
   </main>
 </body>

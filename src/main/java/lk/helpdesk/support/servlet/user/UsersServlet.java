@@ -13,23 +13,27 @@ import java.util.List;
 public class UsersServlet extends HttpServlet {
     private final UserDAO dao = new UserDAO();
 
+    private boolean isAdmin(HttpServletRequest req) {
+        Object role = req.getAttribute("role");
+        return role != null && "Admin".equals(role.toString());
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        String role = (String) req.getAttribute("role");
-        boolean isAdmin = "Admin".equals(role);
-        req.setAttribute("isAdmin", isAdmin);
-        if (!isAdmin) {
-            resp.sendRedirect(req.getContextPath() + "/tickets");
+        if (!isAdmin(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
+        req.setAttribute("isAdmin", true);
 
         int page = 1;
-        String p = req.getParameter("page");
-        if (p != null) {
-            try { page = Math.max(1, Integer.parseInt(p)); }
-            catch (NumberFormatException ignored) {}
+        String pageParam = req.getParameter("page");
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+                if (page < 1) page = 1;
+            } catch (NumberFormatException ignored) { }
         }
 
         try {
@@ -37,16 +41,15 @@ public class UsersServlet extends HttpServlet {
             int totalPages = (totalCount + UserDAO.PAGE_SIZE - 1) / UserDAO.PAGE_SIZE;
             List<User> users = dao.findPage(page);
 
-            req.setAttribute("usersList",  users);
-            req.setAttribute("isAdmin",    true);
+            req.setAttribute("usersList",   users);
             req.setAttribute("currentPage", page);
             req.setAttribute("totalPages",  totalPages);
+
+            req.getRequestDispatcher("/WEB-INF/jsp/users.jsp")
+               .forward(req, resp);
 
         } catch (Exception e) {
             throw new ServletException("Error loading users", e);
         }
-
-        req.getRequestDispatcher("/WEB-INF/jsp/users.jsp")
-           .forward(req, resp);
     }
 }

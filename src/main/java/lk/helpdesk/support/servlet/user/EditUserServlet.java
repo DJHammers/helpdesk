@@ -5,7 +5,8 @@ import lk.helpdesk.support.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.*;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @WebServlet("/users/edit")
 @MultipartConfig(
-    fileSizeThreshold   = 1024 * 1024,  
+    fileSizeThreshold   = 1024 * 1024,
     maxFileSize         = 5 * 1024 * 1024,
     maxRequestSize      = 6 * 1024 * 1024
 )
@@ -22,9 +23,22 @@ public class EditUserServlet extends HttpServlet {
     private static final List<String> ROLES = Arrays.asList("User", "Support", "Admin");
     private final UserDAO dao = new UserDAO();
 
+    private boolean isAdmin(HttpServletRequest req) {
+        Object role = req.getAttribute("role");
+        return role != null && "Admin".equals(role.toString());
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        if (!isAdmin(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        req.setAttribute("isAdmin", true);
+        req.setAttribute("roles", ROLES);
+
         String idParam = req.getParameter("id");
         int userId;
         try {
@@ -45,9 +59,6 @@ public class EditUserServlet extends HttpServlet {
             throw new ServletException("Error loading user", e);
         }
 
-        boolean isAdmin = "Admin".equals(req.getAttribute("role"));
-        req.setAttribute("isAdmin", isAdmin);
-        req.setAttribute("roles", ROLES);
         req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
            .forward(req, resp);
     }
@@ -55,15 +66,18 @@ public class EditUserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        if (!isAdmin(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+        req.setAttribute("isAdmin", true);
+        req.setAttribute("roles", ROLES);
+
         String idParam  = req.getParameter("id");
         String username = req.getParameter("username").trim();
         String email    = req.getParameter("email").trim();
         String role     = req.getParameter("role");
         String password = req.getParameter("password");
-
-        boolean isAdmin = "Admin".equals(req.getAttribute("role"));
-        req.setAttribute("isAdmin", isAdmin);
-        req.setAttribute("roles", ROLES);
 
         int userId;
         try {
@@ -82,7 +96,8 @@ public class EditUserServlet extends HttpServlet {
             u.setEmail(email);
             u.setRole(role);
             req.setAttribute("user", u);
-            req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
+               .forward(req, resp);
             return;
         }
 

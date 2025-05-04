@@ -5,7 +5,8 @@ import lk.helpdesk.support.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.*;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -22,11 +23,21 @@ public class AddUserServlet extends HttpServlet {
     private static final List<String> ROLES = Arrays.asList("User", "Support", "Admin");
     private final UserDAO dao = new UserDAO();
 
+    private boolean isAdmin(HttpServletRequest req) {
+        Object role = req.getAttribute("role");
+        return role != null && "Admin".equals(role.toString());
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        boolean isAdmin = "Admin".equals(req.getAttribute("role"));
-        req.setAttribute("isAdmin", isAdmin);
+        
+        if (!isAdmin(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        req.setAttribute("isAdmin", true);
         req.setAttribute("roles", ROLES);
         req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
            .forward(req, resp);
@@ -35,24 +46,32 @@ public class AddUserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        
+        if (!isAdmin(req)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        req.setAttribute("isAdmin", true);
+        req.setAttribute("roles", ROLES);
+
         String username = req.getParameter("username").trim();
         String email    = req.getParameter("email").trim();
         String password = req.getParameter("password");
         String role     = req.getParameter("role");
 
-        boolean isAdmin = "Admin".equals(req.getAttribute("role"));
-        req.setAttribute("isAdmin", isAdmin);
-        req.setAttribute("roles", ROLES);
-
-        if (username.isBlank() || email.isBlank() || password == null || password.isBlank() ||
-            role == null || !ROLES.contains(role)) {
-            req.setAttribute("errorMessage", "All fields except profile picture are required and must be valid.");
+        if (username.isBlank() || email.isBlank()
+         || password == null || password.isBlank()
+         || role == null || !ROLES.contains(role)) {
+            req.setAttribute("errorMessage",
+                "All fields except profile picture are required and must be valid.");
             User pre = new User();
             pre.setUsername(username);
             pre.setEmail(email);
             pre.setRole(role);
             req.setAttribute("user", pre);
-            req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
+               .forward(req, resp);
             return;
         }
 
@@ -64,7 +83,8 @@ public class AddUserServlet extends HttpServlet {
                 pre.setEmail(email);
                 pre.setRole(role);
                 req.setAttribute("user", pre);
-                req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp")
+                   .forward(req, resp);
                 return;
             }
 

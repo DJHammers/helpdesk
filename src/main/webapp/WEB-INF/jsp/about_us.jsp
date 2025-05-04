@@ -3,22 +3,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Create Ticket – Help Desk Support System</title>
-  <script>
-    function updateCounts() {
-      const subjectEl = document.getElementById('subject');
-      const descEl    = document.getElementById('description');
-      document.getElementById('subCount').textContent  = subjectEl.value.length + '/100';
-      document.getElementById('descCount').textContent = descEl.value.length     + '/1000';
-    }
-    document.addEventListener('DOMContentLoaded', updateCounts);
-  </script>
+  <title>About Us – Help Desk Support System</title>
 </head>
-
 <body class="flex h-screen bg-white">
   <!-- Sidebar -->
   <aside class="w-64 bg-[#1b87e7] flex flex-col justify-between">
@@ -98,48 +88,48 @@
     </div>
   </aside>
 
-  <!-- Create Ticket Form -->
-  <main class="flex-1 flex items-center justify-center p-8 overflow-auto">
-    <div class="w-full max-w-lg bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
-      <h2 class="text-2xl font-semibold mb-6 text-center text-gray-800">Create Ticket</h2>
+  <!-- Main Content -->
+  <main class="flex-1 p-8 overflow-auto bg-white">
+    <div class="max-w-3xl mx-auto space-y-8">
+      <h1 class="text-3xl font-bold text-gray-800">About Help Desk Support System</h1>
+      
+      <div class="bg-white border border-[#1b87e7] rounded-lg ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-6 space-y-6">
+        <p class="text-gray-700 leading-relaxed">
+          Welcome to Help Desk Support System, your centralized portal for managing
+          user requests, troubleshooting issues, and delivering exceptional service.
+          Our platform empowers organizations to track, resolve, and report on
+          technical and operational tickets with ease.
+        </p>
 
-      <form action="${pageContext.request.contextPath}/tickets/create"
-            method="post"
-            class="space-y-6"
-            oninput="updateCounts()">
-
-        <!-- Subject (max 100) -->
-        <div>
-          <label for="subject" class="block text-sm font-medium text-gray-700">
-            Subject (<span id="subCount">0/100</span>)
-          </label>
-          <input id="subject"
-                 name="subject"
-                 type="text"
-                 required
-                 maxlength="100"
-                 class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1b87e7] break-words"/>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-800">Our Mission</h2>
+            <p class="text-gray-700">
+              To streamline support operations by providing an intuitive,
+              role-based workflow that connects users, support staff, and
+              administrators in one cohesive system.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-800">Key Features</h2>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+              <li>Ticket Creation & Assignment</li>
+              <li>Real-time Messaging & Notifications</li>
+              <li>Feedback Collection & Rating</li>
+              <li>Contact & About Us Pages</li>
+              <li>Role-based Access Control</li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Description (max 1000) -->
-        <div>
-          <label for="description" class="block text-sm font-medium text-gray-700">
-            Description (<span id="descCount">0/1000</span>)
-          </label>
-          <textarea id="description"
-                    name="description"
-                    rows="5"
-                    required
-                    maxlength="1000"
-                    class="block w-full rounded-lg border border-gray-300 px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1b87e7] whitespace-pre-line break-words"
-                    placeholder="Describe your issue…"></textarea>
-        </div>
-
-        <button type="submit"
-                class="w-full rounded-lg bg-[#1b87e7] py-2 font-semibold text-white shadow-sm hover:bg-[#1b87e7]/80 focus:outline-none focus:ring-2 focus:ring-[#1b87e7]">
-          Submit Ticket
-        </button>
-      </form>
+        <h2 class="text-xl font-semibold text-gray-800">Why Choose Us?</h2>
+        <p class="text-gray-700 leading-relaxed">
+          Our system is built with scalability, usability, and transparency
+          in mind. Whether you're a small team or a large enterprise, you can
+          customize workflows, generate reports, and ensure every ticket is
+          handled promptly.
+        </p>
+      </div>
     </div>
   </main>
 </body>
