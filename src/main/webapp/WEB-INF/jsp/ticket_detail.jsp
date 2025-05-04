@@ -129,8 +129,8 @@
           </form>
         </c:if>
 
-        <!-- Mark In Progress -->
-        <c:if test="${status == 'Open' and (role=='Admin' or role=='Support')}">
+        <!-- Mark In Progress (Open or Resolved) -->
+        <c:if test="${(status == 'Open' or status == 'Resolved') and (role=='Admin' or role=='Support')}">
           <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
             <input type="hidden" name="ticketId" value="${ticketId}" />
             <input type="hidden" name="status"   value="In_Progress" />
@@ -140,7 +140,18 @@
           </form>
         </c:if>
 
-        <!-- Reopen Ticket -->
+        <!-- Mark Resolved -->
+        <c:if test="${status ne 'Resolved' and status ne 'Closed' and (role=='Admin' or role=='Support')}">
+          <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
+            <input type="hidden" name="ticketId" value="${ticketId}" />
+            <input type="hidden" name="status"   value="Resolved" />
+            <button class="px-4 py-2 bg-[#1b87e7] text-white rounded-lg hover:bg-[#1b87e7]/80 text-sm font-medium transition">
+              Mark Resolved
+            </button>
+          </form>
+        </c:if>
+
+        <!-- Reopen Ticket (only if Closed) -->
         <c:if test="${status == 'Closed'}">
           <form action="${pageContext.request.contextPath}/tickets/status" method="post" class="inline">
             <input type="hidden" name="ticketId" value="${ticketId}" />
