@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Contact Us – Help Desk Support System</title>
+  <title>Contact Us – Help Desk</title>
 </head>
 <body class="flex h-screen bg-white">
   <!-- Sidebar -->

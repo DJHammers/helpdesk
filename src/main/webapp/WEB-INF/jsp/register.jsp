@@ -7,16 +7,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Register – Help Desk Support System</title>
+  <title>Register – Help Desk</title>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
-  <div class="w-full max-w-sm bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
+<body class="bg-gray-50 flex items-center justify-center min-h-screen px-4">
+  <div class="w-full max-w-md bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
+    
+    <!-- Logo + System Name -->
+    <div class="flex flex-col items-center mb-6">
+      <img src="${pageContext.request.contextPath}/images/helpdesk.png"
+           alt="Help Desk Logo"
+           class="w-24 h-24 mb-4"/>
+      <h1 class="text-xl font-bold text-center text-gray-800">
+        Help Desk Support<br/>Ticket System
+      </h1>
+    </div>
+
+    <!-- Create Account Header -->
     <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Create Account</h2>
 
+    <!-- Registration Form -->
     <form method="post"
           action="${pageContext.request.contextPath}/register"
           class="space-y-5">
-
+      
       <div class="space-y-1">
         <label for="username" class="text-sm font-medium text-gray-700">Username</label>
         <input id="username" name="username" type="text" required
@@ -47,14 +60,18 @@
       </button>
     </form>
 
+    <!-- Error Message -->
     <c:if test="${not empty error}">
       <p class="mt-4 text-center text-red-600 text-sm">${error}</p>
     </c:if>
 
+    <!-- Link to Sign In -->
     <p class="mt-6 text-center text-sm text-gray-600">
       Already have an account?
       <a href="${pageContext.request.contextPath}/login"
-         class="font-medium text-[#1b87e7] hover:underline">Sign in</a>
+         class="font-medium text-[#1b87e7] hover:underline">
+        Sign In
+      </a>
     </p>
   </div>
 </body>

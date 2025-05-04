@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Dashboard – Help Desk Support System</title>
+  <title>Dashboard – Help Desk</title>
 </head>
 <body class="flex h-screen bg-white">
   <aside class="w-64 bg-[#1b87e7] flex flex-col justify-between">

@@ -7,10 +7,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>Login – Help Desk Support System</title>
+  <title>Login – Help Desk</title>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
-  <div class="w-full max-w-sm bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
+<body class="bg-gray-50 flex items-center justify-center min-h-screen px-4">
+  <div class="w-full max-w-md bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
+    <div class="flex flex-col items-center mb-6">
+      <img src="${pageContext.request.contextPath}/images/helpdesk.png"
+           alt="Help Desk Logo"
+           class="w-24 h-24 mb-4"/>
+      <h1 class="text-xl font-bold text-center text-gray-800">
+        Help Desk Support<br/>Ticket System
+      </h1>
+    </div>
+
+    <!-- Sign In Form -->
     <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Sign In</h2>
     <form method="post"
           action="${pageContext.request.contextPath}/login"
@@ -36,9 +46,11 @@
         Login
       </button>
     </form>
+
     <c:if test="${not empty error}">
       <p class="mt-4 text-center text-red-600 text-sm">${error}</p>
     </c:if>
+
     <p class="mt-6 text-center text-sm text-gray-600">
       Don't have an account?
       <a href="${pageContext.request.contextPath}/register"
