@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
+  <link rel="icon" type="image/png" href="<c:url value='/images/helpdesk.png'/>"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <title>Register – Help Desk</title>
 </head>
@@ -14,7 +14,7 @@
     
     <!-- Logo + System Name -->
     <div class="flex flex-col items-center mb-6">
-      <img src="${pageContext.request.contextPath}/images/helpdesk.png"
+      <img src="<c:url value='/images/helpdesk.png'/>"
            alt="Help Desk Logo"
            class="w-24 h-24 mb-4"/>
       <h1 class="text-xl font-bold text-center text-gray-800">

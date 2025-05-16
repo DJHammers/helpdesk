@@ -5,14 +5,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/helpdesk.png"/>
+  <link rel="icon" type="image/png" href="<c:url value='/images/helpdesk.png' />"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <title>Login – Help Desk</title>
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen px-4">
   <div class="w-full max-w-md bg-white border border-[#1b87e7] rounded-2xl ring-1 ring-[#1b87e7] ring-opacity-100 shadow-sm shadow-[#1b87e7]/20 p-8">
+    
+    <!-- Logo + Title -->
     <div class="flex flex-col items-center mb-6">
-      <img src="${pageContext.request.contextPath}/images/helpdesk.png"
+      <img src="<c:url value='/images/helpdesk.png' />"
            alt="Help Desk Logo"
            class="w-24 h-24 mb-4"/>
       <h1 class="text-xl font-bold text-center text-gray-800">
